@@ -1,0 +1,22 @@
+{
+  "name": "bird-view",
+  "description": "Employment Hero Squad Health Check",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "Employment Hero",
+  "license": "MIT",
+  "scripts": {
+    "start": "bsb -clean -make-world -w",
+    "dev": "parcel ./index.html"
+  },
+  "devDependencies": {
+    "bs-platform": "^5.2.1",
+    "bsb-js": "^1.1.7",
+    "graphql_ppx": "^0.2.8",
+    "parcel-bundler": "^1.12.4",
+    "reason-react": "^0.7.0"
+  },
+  "dependencies": {
+    "reason-apollo": "^0.17.0"
+  }
+}
