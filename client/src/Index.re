@@ -1,6 +1,6 @@
 ReactDOMRe.renderToElementWithId(
-  <div>
-  {ReasonReact.string("Hello world")}
-  </div>,
+  <ReasonApollo.Provider client=Client.instance>
+    <App />
+  </ReasonApollo.Provider>,
   "root",
 );
