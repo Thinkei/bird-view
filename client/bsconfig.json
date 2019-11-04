@@ -18,7 +18,9 @@
   "bs-dependencies": [
     "reason-react",
     "reason-react",
-    "reason-apollo"
+    "reason-apollo-hooks",
+    "reason-apollo",
+    "re-tailwind"
   ],
   "ppx-flags": [
     "graphql_ppx/ppx"
