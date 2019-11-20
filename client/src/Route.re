@@ -8,6 +8,7 @@ module type Config = {
 module Config = {
   type route =
     | Home
+    | BirdViewDetail(string)
     | NotFound;
 
   let toRoute = (url: ReasonReact.Router.url) => {
@@ -18,6 +19,7 @@ module Config = {
     | ["/"] =>
       switch (hashes) {
       | [""] => Home
+      | ["", "bird-views", birdViewId] => BirdViewDetail(birdViewId)
       | _ => NotFound
       }
     | _ => NotFound
@@ -27,12 +29,13 @@ module Config = {
   let toUrl =
     fun
     | Home => "#"
+    | BirdViewDetail(id) => "#/bird-views/" ++ id
     | NotFound => "#/404";
 };
 
 module Link = {
   [@react.component]
-  let make = (~route, ~style=?, ~className, ~children) => {
+  let make = (~route, ~style=?, ~className=?, ~children) => {
     let href = Config.toUrl(route);
     let onClick = e => {
       ReactEvent.Mouse.preventDefault(e);
