@@ -48,27 +48,28 @@ module TableConfig = {
 
 module RenderByTable = Table.Make(TableConfig);
 
-/* Fixed member id temporarily */
 module QueryConfig = [%graphql
   {|
-  query allMemberBirdViewTemplates {
-    allMemberBirdViewTemplates(filter: { member: { id: "ck22zb1e5050g0165vovwu8ct"}}) {
-      id
-      createdAt
-      member {
-        email
-        name
+    query allMemberBirdViewTemplates($memberId: ID) {
+      allMemberBirdViewTemplates(filter: { member: { id: $memberId}}) {
+        id
+        createdAt
+        member {
+          email
+          name
+        }
       }
     }
-  }
-|}
+  |}
 ];
 
 module Query = ReasonApolloHooks.Query.Make(QueryConfig);
 
 [@react.component]
 let make = () => {
-  let (queryState, _full) = Query.use();
+  let memberId = Session.memberId;
+  let variables = QueryConfig.make(~memberId, ())##variables;
+  let (queryState, _full) = Query.use(~variables, ());
 
   <div>
     <h2
@@ -84,8 +85,8 @@ let make = () => {
        <RenderByTable
          data={data##allMemberBirdViewTemplates |> Array.to_list}
        />
-     | NoData
-     | Error(_) => <p> {React.string("You are lucky! Ping us")} </p>
+     | NoData => <EmptyData />
+     | Error(e) => <FriendlyError message=e##message />
      }}
   </div>;
 };
