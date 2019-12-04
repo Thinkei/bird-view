@@ -4,6 +4,9 @@ let make = () => {
     className=TW.(
       [Margin(My2), Margin(Mx2), TextAlign(TextCenter)] |> make
     )>
-    {ReasonReact.string("Loading...")}
+    <img
+      className=TW.([Margin(MxAuto)] |> make)
+      src={Utils.requireURI("./loading.svg")}
+    />
   </div>;
 };

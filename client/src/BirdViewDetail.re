@@ -36,16 +36,11 @@ let make = (~id) => {
     | None => <EmptyData />
     | Some(data) =>
       <div>
-        <MemberInfo
-          name={
-            data##member
-            ->Belt.Option.mapWithDefault("Unknown", member => member##name)
-          }
-        />
         {switch (data##birdViewTemplate) {
          | None => <FriendlyError message="Invalid birdview template" />
 
-         | Some(data) => <BirdViewTemplate name=data##name />
+         | Some(data) =>
+           <BirdViewTemplate name=data##name questions=data##questions />
          }}
       </div>
     };

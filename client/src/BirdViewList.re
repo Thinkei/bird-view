@@ -37,11 +37,21 @@ module TableConfig = {
       data##member->Belt.Option.mapWithDefault("", member => member##name)
       |> str
     | Action =>
-      <Button onClick={_ => ()}>
-        <Route.Link route=Route.Config.(BirdViewDetail(data##id))>
-          {str("Detail")}
-        </Route.Link>
-      </Button>;
+      <Route.Link
+        className=TW.(
+          [
+            BackgroundColor(BgBlue500),
+            BackgroundColor(HoverBgBlue700),
+            TextColor(TextWhite),
+            Padding(Py2),
+            Padding(Px4),
+            BorderRadius(Rounded),
+          ]
+          |> make
+        )
+        route=Route.Config.(BirdViewDetail(data##id))>
+        {str("Detail")}
+      </Route.Link>;
 
   let columns = [CreatedAt, Name, Action];
 };
@@ -72,13 +82,7 @@ let make = () => {
   let (queryState, _full) = Query.use(~variables, ());
 
   <div>
-    <h2
-      className=TW.(
-        [TextAlign(TextCenter), Margin(My2), TextTransform(Uppercase)]
-        |> make
-      )>
-      {str("Bird view answer history")}
-    </h2>
+    <Headline> {str("ANSWER HISTORY")} </Headline>
     {switch (queryState) {
      | Loading => <Spinner />
      | Data(data) =>
