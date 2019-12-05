@@ -1,2 +1,2 @@
 [@react.component]
-let make = () => <div> <BirdViewList /> </div>;
+let make = () => <div> <SurveysList /> </div>;

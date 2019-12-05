@@ -8,7 +8,7 @@ module type Config = {
 module Config = {
   type route =
     | Home
-    | BirdViewDetail(string)
+    | SurveyDetail(string)
     | NotFound;
 
   let toRoute = (url: ReasonReact.Router.url) => {
@@ -19,7 +19,7 @@ module Config = {
     | ["/"] =>
       switch (hashes) {
       | [""] => Home
-      | ["", "bird-views", birdViewId] => BirdViewDetail(birdViewId)
+      | ["", "surveys", birdViewId] => SurveyDetail(birdViewId)
       | _ => NotFound
       }
     | _ => NotFound
@@ -29,7 +29,7 @@ module Config = {
   let toUrl =
     fun
     | Home => "#"
-    | BirdViewDetail(id) => "#/bird-views/" ++ id
+    | SurveyDetail(id) => "#/surveys/" ++ id
     | NotFound => "#/404";
 };
 

@@ -9,27 +9,27 @@ module TableConfig = {
   type rowData = {
     .
     "id": string,
-    "content": string,
+    "description": string,
     "goodExample": string,
     "badExample": string,
   };
 
   type column =
-    | Content
+    | Description
     | GoodExample
     | BadExample
     | Answer;
 
   let getColumnHeader =
     fun
-    | Content => "Description"
+    | Description => "Description"
     | GoodExample => "Good Example"
     | BadExample => "Bad Example"
     | Answer => "Answer";
 
   let render = data =>
     fun
-    | Content => data##content |> str
+    | Description => data##description |> str
     | GoodExample => data##goodExample |> str
     | BadExample => data##badExample |> str
     | Answer =>
@@ -39,28 +39,10 @@ module TableConfig = {
         <SelectOption> {"Red" |> str} </SelectOption>
       </Select>;
 
-  let columns = [Content, GoodExample, BadExample, Answer];
+  let columns = [Description, GoodExample, BadExample, Answer];
 };
 
-module QuestionsTable = Table.Make(TableConfig);
+module CardsTable = Table.Make(TableConfig);
 
 [@react.component]
-let make = (~name, ~questions) => {
-  Js.log(questions);
-  <div>
-    <Headline>
-      <p>
-        <span> {ReasonReact.string("Answer for birdview: ")} </span>
-        <strong> {ReasonReact.string(name)} </strong>
-      </p>
-    </Headline>
-    <QuestionsTable
-      data={
-        switch (questions) {
-        | None => []
-        | Some(qs) => qs |> Array.to_list
-        }
-      }
-    />
-  </div>;
-};
+let make = (~data) => <CardsTable data />;

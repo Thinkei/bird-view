@@ -6,36 +6,34 @@ let optionStr =
   | Some(v) => str(v);
 
 module TableConfig = {
-  type member = {
-    .
-    "email": string,
-    "name": string,
-  };
+  type squad = {. "name": string};
 
   type rowData = {
     .
     "id": string,
     "createdAt": Js.Json.t,
-    "member": option(member),
+    "name": string,
+    "squad": squad,
   };
 
   type column =
     | CreatedAt
     | Name
+    | SquadName
     | Action;
 
   let getColumnHeader =
     fun
     | CreatedAt => "Created At"
-    | Name => "Name"
+    | Name => "Survey Name"
+    | SquadName => "Squad Name"
     | Action => "Action";
 
   let render = data =>
     fun
     | CreatedAt => data##createdAt |> Js.Json.decodeString |> optionStr
-    | Name =>
-      data##member->Belt.Option.mapWithDefault("", member => member##name)
-      |> str
+    | Name => data##name |> str
+    | SquadName => data##squad##name |> str
     | Action =>
       <Route.Link
         className=TW.(
@@ -49,23 +47,23 @@ module TableConfig = {
           ]
           |> make
         )
-        route=Route.Config.(BirdViewDetail(data##id))>
+        route=Route.Config.(SurveyDetail(data##id))>
         {str("Detail")}
       </Route.Link>;
 
-  let columns = [CreatedAt, Name, Action];
+  let columns = [CreatedAt, Name, SquadName, Action];
 };
 
-module RenderByTable = Table.Make(TableConfig);
+module SurveysList = Table.Make(TableConfig);
 
 module QueryConfig = [%graphql
   {|
-    query allMemberBirdViewTemplates($memberId: ID) {
-      allMemberBirdViewTemplates(filter: { member: { id: $memberId}}) {
+    query allSurveys($squadId: ID) {
+      allSurveys(filter: { squad: { id: $squadId}}) {
         id
         createdAt
-        member {
-          email
+        name
+        squad {
           name
         }
       }
@@ -77,18 +75,15 @@ module Query = ReasonApolloHooks.Query.Make(QueryConfig);
 
 [@react.component]
 let make = () => {
-  let memberId = Session.memberId;
-  let variables = QueryConfig.make(~memberId, ())##variables;
+  let squadId = Session.squadId;
+  let variables = QueryConfig.make(~squadId, ())##variables;
   let (queryState, _full) = Query.use(~variables, ());
 
   <div>
-    <Headline> {str("ANSWER HISTORY")} </Headline>
+    <Headline> {str("YOUR BIRDVIEW SURVEYS")} </Headline>
     {switch (queryState) {
      | Loading => <Spinner />
-     | Data(data) =>
-       <RenderByTable
-         data={data##allMemberBirdViewTemplates |> Array.to_list}
-       />
+     | Data(data) => <SurveysList data={data##allSurveys |> Array.to_list} />
      | NoData => <EmptyData />
      | Error(e) => <FriendlyError message=e##message />
      }}

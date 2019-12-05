@@ -11,7 +11,7 @@ let make = () =>
        Route.Config.(
          switch (currentRoute) {
          | Home => <Home />
-         | BirdViewDetail(id) => <BirdViewDetail id={id} />
+         | SurveyDetail(id) => <SurveyDetail id={id} />
          | NotFound => <div> {ReasonReact.string("Not Found")} </div>
          }
        )}
