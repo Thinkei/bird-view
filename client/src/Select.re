@@ -1,7 +1,7 @@
 [@react.component]
-let make = (~children) => {
-  <select
-    className=TW.(
+let make = (~className=?, ~children) => {
+  let defaultClassName =
+    TW.(
       [
         Display(Block),
         AppearanceNone,
@@ -19,7 +19,14 @@ let make = (~children) => {
         BorderColor(FocusBorderGray500),
       ]
       |> make
-    )>
+    );
+  <select
+    className={
+      switch (className) {
+      | None => defaultClassName
+      | Some(v) => defaultClassName ++ " " ++ v
+      }
+    }>
     children
   </select>;
 };
