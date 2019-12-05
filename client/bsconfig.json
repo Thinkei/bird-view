@@ -22,9 +22,7 @@
     "reason-apollo",
     "re-tailwind"
   ],
-  "ppx-flags": [
-    "graphql_ppx/ppx"
-  ],
+  "ppx-flags": ["@baransu/graphql_ppx_re/ppx6"],
   "warnings": {
     "error": "+5+8"
   },
