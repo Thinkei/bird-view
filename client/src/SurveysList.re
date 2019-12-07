@@ -29,8 +29,8 @@ module TableConfig = {
     | SquadName => "Squad Name"
     | Action => "Action";
 
-  let render = data =>
-    fun
+  let render = (data, column) =>
+    switch (column) {
     | CreatedAt => data##createdAt |> Js.Json.decodeString |> optionStr
     | Name => data##name |> str
     | SquadName => data##squad##name |> str
@@ -49,12 +49,13 @@ module TableConfig = {
         )
         route=Route.Config.(SurveyDetail(data##id))>
         {str("Detail")}
-      </Route.Link>;
+      </Route.Link>
+    };
 
   let columns = [CreatedAt, Name, SquadName, Action];
 };
 
-module SurveysList = Table.Make(TableConfig);
+module SurveysList = CreateTable.Make(TableConfig);
 
 module QueryConfig = [%graphql
   {|

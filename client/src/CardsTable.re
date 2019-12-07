@@ -1,48 +1,76 @@
 let str = ReasonReact.string;
 
-let optionStr =
+module QueryConfig = [%graphql
+  {|
+    query allAnswerRecords($surveyId: ID, $memberId: ID) {
+      allAnswerRecords(filter: { survey: { id: $surveyId}, member: { id: $memberId }}) {
+        id
+        answer
+        card { id }
+      }
+    }
+  |}
+];
+
+let rec findAnswerRecord = cardId =>
   fun
-  | None => str("")
-  | Some(v) => str(v);
+  | [] => None
+  | [h, ...tail] =>
+    h##card##id == cardId ? Some(h) : findAnswerRecord(cardId, tail);
 
-module TableConfig = {
-  type rowData = {
-    .
-    "id": string,
-    "description": string,
-    "goodExample": string,
-    "badExample": string,
+module RenderByTable = {
+  [@react.component]
+  let make = (~data, ~answerRecords) => {
+    <Table>
+      <thead>
+        <TableRow>
+          <TableHeader> {"Description" |> str} </TableHeader>
+          <TableHeader> {"Example of Awesome" |> str} </TableHeader>
+          <TableHeader> {"Example of Crappy" |> str} </TableHeader>
+          <TableHeader> {"Your answer" |> str} </TableHeader>
+        </TableRow>
+      </thead>
+      <tbody>
+        {data
+         |> List.map(rowData =>
+              <TableRow>
+                <TableData> {rowData##description |> str} </TableData>
+                <TableData> {rowData##goodExample |> str} </TableData>
+                <TableData> {rowData##badExample |> str} </TableData>
+                <TableData>
+                  <AnswerSelect
+                    answerRecord={findAnswerRecord(
+                      rowData##id,
+                      answerRecords,
+                    )}
+                    cardId=rowData##id
+                  />
+                </TableData>
+              </TableRow>
+            )
+         |> Array.of_list
+         |> ReasonReact.array}
+      </tbody>
+    </Table>;
   };
-
-  type column =
-    | Description
-    | GoodExample
-    | BadExample
-    | Answer;
-
-  let getColumnHeader =
-    fun
-    | Description => "Description"
-    | GoodExample => "Good Example"
-    | BadExample => "Bad Example"
-    | Answer => "Answer";
-
-  let render = data =>
-    fun
-    | Description => data##description |> str
-    | GoodExample => data##goodExample |> str
-    | BadExample => data##badExample |> str
-    | Answer =>
-      <Select>
-        <SelectOption> {"Green" |> str} </SelectOption>
-        <SelectOption> {"Yellow" |> str} </SelectOption>
-        <SelectOption> {"Red" |> str} </SelectOption>
-      </Select>;
-
-  let columns = [Description, GoodExample, BadExample, Answer];
 };
 
-module CardsTable = Table.Make(TableConfig);
+module Query = ReasonApolloHooks.Query.Make(QueryConfig);
 
 [@react.component]
-let make = (~data) => <CardsTable data />;
+let make = (~data, ~surveyId) => {
+  let variables =
+    QueryConfig.make(~surveyId, ~memberId=Session.memberId, ())##variables;
+  let (queryState, _full) = Query.use(~variables, ());
+
+  switch (queryState) {
+  | Loading => <Spinner />
+  | Data(res) =>
+    <RenderByTable
+      data
+      answerRecords={res##allAnswerRecords |> Array.to_list}
+    />
+  | NoData => <RenderByTable data answerRecords=[] />
+  | Error(e) => <FriendlyError message=e##message />
+  };
+};

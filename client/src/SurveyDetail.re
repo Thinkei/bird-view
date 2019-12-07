@@ -14,12 +14,13 @@ module CardQueryConfig = [%graphql
 module Query = ReasonApolloHooks.Query.Make(CardQueryConfig);
 
 [@react.component]
-let make = (~id as _) => {
+let make = (~id) => {
   let (queryState, _full) = Query.use();
 
   switch (queryState) {
   | Loading => <Spinner />
-  | Data(data) => <CardsTable data={data##allCards |> Array.to_list} />
+  | Data(data) =>
+    <CardsTable surveyId=id data={data##allCards |> Array.to_list} />
   | NoData => <EmptyData />
   | Error(e) => <FriendlyError message=e##message />
   };
