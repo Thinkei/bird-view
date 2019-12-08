@@ -21,6 +21,7 @@ let rec findAnswerRecord = cardId =>
 module RenderByTable = {
   [@react.component]
   let make = (~data, ~answerRecords) => {
+    Js.log(answerRecords);
     <Table>
       <thead>
         <TableRow>
