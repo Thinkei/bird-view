@@ -3,8 +3,8 @@ let str = ReasonReact.string;
 
 module CreateConfig = [%graphql
   {|
-  mutation createAnswerRecord($cardId: ID!, $memberId: ID!, $surveyId: ID!, $answer: AnswerOption!) {
-    createAnswerRecord(cardId: $cardId, memberId: $memberId, surveyId: $surveyId, answer: $answer) {
+  mutation createAnswerRecord($cardId: ID!, $userId: ID!, $surveyId: ID!, $answer: AnswerOption!) {
+    createAnswerRecord(cardId: $cardId, userId: $userId, surveyId: $surveyId, answer: $answer) {
       id
       answer
       card { id }
@@ -44,7 +44,7 @@ let make = (~surveyId, ~cardId) => {
               CreateConfig.make(
                 ~cardId,
                 ~surveyId,
-                ~memberId=Session.memberId,
+                ~userId=Session.userId,
                 ~answer,
                 (),
               )##variables;

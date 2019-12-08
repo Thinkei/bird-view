@@ -2,8 +2,8 @@ let str = ReasonReact.string;
 
 module QueryConfig = [%graphql
   {|
-    query allAnswerRecords($surveyId: ID, $memberId: ID) {
-      allAnswerRecords(filter: { survey: { id: $surveyId}, member: { id: $memberId }}) {
+    query allAnswerRecords($surveyId: ID, $userId: ID) {
+      allAnswerRecords(filter: { survey: { id: $surveyId}, user: { id: $userId }}) {
         id
         answer
         card { id }
@@ -70,7 +70,7 @@ module Query = ReasonApolloHooks.Query.Make(QueryConfig);
 [@react.component]
 let make = (~data, ~surveyId) => {
   let variables =
-    QueryConfig.make(~surveyId, ~memberId=Session.memberId, ())##variables;
+    QueryConfig.make(~surveyId, ~userId=Session.userId, ())##variables;
   let (queryState, _full) = Query.use(~variables, ());
 
   switch (queryState) {
