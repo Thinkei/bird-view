@@ -20,39 +20,48 @@ let rec findAnswerRecord = cardId =>
 
 module RenderByTable = {
   [@react.component]
-  let make = (~data, ~answerRecords) => {
-    Js.log(answerRecords);
-    <Table>
-      <thead>
-        <TableRow>
-          <TableHeader> {"Description" |> str} </TableHeader>
-          <TableHeader> {"Example of Awesome" |> str} </TableHeader>
-          <TableHeader> {"Example of Crappy" |> str} </TableHeader>
-          <TableHeader> {"Your answer" |> str} </TableHeader>
-        </TableRow>
-      </thead>
-      <tbody>
-        {data
-         |> List.map(rowData =>
-              <TableRow>
-                <TableData> {rowData##description |> str} </TableData>
-                <TableData> {rowData##goodExample |> str} </TableData>
-                <TableData> {rowData##badExample |> str} </TableData>
-                <TableData>
-                  <AnswerSelect
-                    answerRecord={findAnswerRecord(
-                      rowData##id,
-                      answerRecords,
-                    )}
-                    cardId=rowData##id
-                  />
-                </TableData>
-              </TableRow>
-            )
-         |> Array.of_list
-         |> ReasonReact.array}
-      </tbody>
-    </Table>;
+  let make = (~data, ~answerRecords, ~surveyId) => {
+    <div>
+      <Headline>
+        <span> {str("ANSWER SHEET: ")} </span>
+        <span> {List.length(answerRecords) |> string_of_int |> str} </span>
+        <span> {"/" |> str} </span>
+        <span> {List.length(data) |> string_of_int |> str} </span>
+      </Headline>
+      <Table>
+        <thead>
+          <TableRow>
+            <TableHeader> {"Description" |> str} </TableHeader>
+            <TableHeader> {"Example of Awesome" |> str} </TableHeader>
+            <TableHeader> {"Example of Crappy" |> str} </TableHeader>
+            <TableHeader> {"Your answer" |> str} </TableHeader>
+          </TableRow>
+        </thead>
+        <tbody>
+          {data
+           |> List.map(rowData => {
+                let answerRecord =
+                  findAnswerRecord(rowData##id, answerRecords);
+                let style =
+                  switch (answerRecord) {
+                  | Some(_) => ReactDOMRe.Style.make()
+                  | None =>
+                    ReactDOMRe.Style.make(~backgroundColor="#fef1f1", ())
+                  };
+                <TableRow style>
+                  <TableData> {rowData##description |> str} </TableData>
+                  <TableData> {rowData##goodExample |> str} </TableData>
+                  <TableData> {rowData##badExample |> str} </TableData>
+                  <TableData>
+                    <AnswerSelect surveyId answerRecord cardId=rowData##id />
+                  </TableData>
+                </TableRow>;
+              })
+           |> Array.of_list
+           |> ReasonReact.array}
+        </tbody>
+      </Table>
+    </div>;
   };
 };
 
@@ -68,10 +77,11 @@ let make = (~data, ~surveyId) => {
   | Loading => <Spinner />
   | Data(res) =>
     <RenderByTable
+      surveyId
       data
       answerRecords={res##allAnswerRecords |> Array.to_list}
     />
-  | NoData => <RenderByTable data answerRecords=[] />
+  | NoData => <RenderByTable surveyId data answerRecords=[] />
   | Error(e) => <FriendlyError message=e##message />
   };
 };

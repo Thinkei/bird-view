@@ -1,6 +1,6 @@
 [@react.component]
-let make = (~children) => {
-  <tr className=TW.([BackgroundColor(HoverBgGreen100)] |> make)>
+let make = (~style=?, ~children) => {
+  <tr ?style className=TW.([BackgroundColor(HoverBgGreen100)] |> make)>
     children
   </tr>;
 };

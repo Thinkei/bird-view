@@ -6,11 +6,13 @@
   "author": "Employment Hero",
   "license": "MIT",
   "scripts": {
-    "start": "bsb -clean -make-world -w",
+    "start": "BS_LOG=* bsb -clean -make-world -w",
     "dev": "parcel ./index.html"
   },
   "devDependencies": {
-    "bs-platform": "^6.2.1",
+    "bs-log": "^1.0.0",
+    "bs-platform": "^7.0.0",
+    "bsb-js": "^1.1.7",
     "parcel-bundler": "^1.12.4",
     "reason-react": "^0.7.0"
   },
