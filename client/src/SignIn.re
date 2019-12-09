@@ -63,58 +63,42 @@ let make = (~setSesion) => {
       <div style=layoutWrapper>
         <Card
           title="Sign In" style={ReactDOMRe.Style.make(~width="300px", ())}>
-          <Input
-            _type="email"
-            style={ReactDOMRe.Style.make(~height="28px", ())}
-            placeholder="Email"
-            onChange={e =>
-              e->ReactEvent.Form.target##value->UpdateEmail->dispatch
-            }
-          />
-          <br />
-          <br />
-          <Input
-            _type="password"
-            style={ReactDOMRe.Style.make(~height="28px", ())}
-            placeholder="Password"
-            onChange={e =>
-              e->ReactEvent.Form.target##value->UpdatePassword->dispatch
-            }
-          />
-          <br />
-          <br />
-          <Button
-            onClick={_ => {
-              let signinVariables =
-                SignInConfig.make(
-                  ~email=state.email,
-                  ~password=state.password,
-                  (),
-                )##variables;
+          <form>
+            <Input
+              _type="email"
+              style={ReactDOMRe.Style.make(~height="28px", ())}
+              placeholder="Email"
+              onChange={e =>
+                e->ReactEvent.Form.target##value->UpdateEmail->dispatch
+              }
+            />
+            <br />
+            <br />
+            <Input
+              _type="password"
+              style={ReactDOMRe.Style.make(~height="28px", ())}
+              placeholder="Password"
+              onChange={e =>
+                e->ReactEvent.Form.target##value->UpdatePassword->dispatch
+              }
+            />
+            <br />
+            <br />
+            <Button
+              onClick={e => {
+                ReactEvent.Synthetic.preventDefault(e);
+                let signinVariables =
+                  SignInConfig.make(
+                    ~email=state.email,
+                    ~password=state.password,
+                    (),
+                  )##variables;
 
-              mutate(~variables=signinVariables, ())
-              |> Js.Promise.then_(res => {
-                   switch (res) {
-                   | Errors(_)
-                   | EmptyResponse =>
-                     Notification.error(
-                       Notification.makeConfigProps(
-                         ~message="Something went wrong!",
-                         (),
-                       ),
-                     )
-                     |> ignore
-                   | Data(data) =>
-                     open Session;
-                     switch (data##signinUser##token, data##signinUser##user) {
-                     | (Some(tk), Some(user)) =>
-                       setSesion({
-                         token: tk,
-                         role: user##role,
-                         userId: user##id,
-                         squadId: Belt.Option.map(user##squad, squad => squad##id),
-                       })
-                     | (_, _) =>
+                mutate(~variables=signinVariables, ())
+                |> Js.Promise.then_(res => {
+                     switch (res) {
+                     | Errors(_)
+                     | EmptyResponse =>
                        Notification.error(
                          Notification.makeConfigProps(
                            ~message="Something went wrong!",
@@ -122,23 +106,47 @@ let make = (~setSesion) => {
                          ),
                        )
                        |> ignore
+                     | Data(data) =>
+                       open Session;
+                       switch (
+                         data##signinUser##token,
+                         data##signinUser##user,
+                       ) {
+                       | (Some(tk), Some(user)) =>
+                         setSesion({
+                           token: tk,
+                           role: user##role,
+                           userId: user##id,
+                           squadId:
+                             Belt.Option.map(user##squad, squad => squad##id),
+                         })
+                       | (_, _) =>
+                         Notification.error(
+                           Notification.makeConfigProps(
+                             ~message="Something went wrong!",
+                             (),
+                           ),
+                         )
+                         |> ignore
+                       };
+                       Notification.success(
+                         Notification.makeConfigProps(
+                           ~message="Sign in successfully",
+                           (),
+                         ),
+                       )
+                       |> ignore;
                      };
-                     Notification.success(
-                       Notification.makeConfigProps(
-                         ~message="Sign in successfully",
-                         (),
-                       ),
-                     )
-                     |> ignore;
-                   };
-                   Js.Promise.resolve();
-                 })
-              |> ignore;
-            }}
-            loading={Button.LoadingProp.Bool(result == Loading)}
-            _type=`primary>
-            {str("Sign in")}
-          </Button>
+                     Js.Promise.resolve();
+                   })
+                |> ignore;
+              }}
+              loading={Button.LoadingProp.Bool(result == Loading)}
+              htmlType="submit"
+              _type=`primary>
+              {str("Sign in")}
+            </Button>
+          </form>
         </Card>
       </div>
     }}

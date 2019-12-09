@@ -53,6 +53,4 @@ let getSessionFromStorage = () => {
   };
 };
 
-let clearSession = () => {
-  LocalStorage.setItem(tokenKey, None);
-};
+let clearSession = () => LocalStorage.removeItem(tokenKey);
