@@ -1,20 +1,58 @@
-let squadId = "ck3sxea970hi20112bpqx6xp0";
-let userId = "ck3wiv08f08zq0170zt011iup";
-
 let tokenKey = "__TOKEN__";
+let roleKey = "__ROLE__";
+let userIdKey = "__USER_ID__";
+let squadIdKey = "__SQUAD_ID__";
+
+[@bs.deriving jsConverter]
+type role = [ | [@bs.as "Member"] `Member | [@bs.as "Leader"] `Leader];
+
+type session = {
+  token: string,
+  role: option(role),
+  userId: string,
+  squadId: option(string),
+};
 
 type token =
   | Invalid
-  | Valid(string);
+  | Valid(session);
 
-let setTokenToStorage = newToken => {
-  LocalStorage.setItem(tokenKey, newToken);
+let setSessionToStorage = session => {
+  LocalStorage.setItem(tokenKey, session.token->Some);
+
+  switch (session.role) {
+  | Some(role) => LocalStorage.setItem(roleKey, Some(role |> roleToJs))
+  | None => ()
+  };
+  LocalStorage.setItem(userIdKey, session.userId->Some);
+  switch (session.squadId) {
+  | Some(squadId) => LocalStorage.setItem(squadIdKey, squadId->Some)
+  | None => ()
+  };
 };
 
-let getTokenFromStorage = () => {
+let getSessionFromStorage = () => {
   let token = LocalStorage.getItem(tokenKey) |> Js.Nullable.toOption;
-  switch (token) {
-  | None => Invalid
-  | Some(v) => Valid(v)
+  let role = LocalStorage.getItem(roleKey) |> Js.Nullable.toOption;
+  let userId = LocalStorage.getItem(userIdKey) |> Js.Nullable.toOption;
+  let squadId = LocalStorage.getItem(squadIdKey) |> Js.Nullable.toOption;
+
+  switch (token, role, userId, squadId) {
+  | (Some(token), roleAsString, Some(userId), squadId) =>
+    Valid({
+      token,
+      role:
+        switch (roleAsString) {
+        | Some("Leader") => Some(`Leader)
+        | _ => Some(`Member)
+        },
+      userId,
+      squadId,
+    })
+  | _ => Invalid
   };
+};
+
+let clearSession = () => {
+  LocalStorage.setItem(tokenKey, None);
 };

@@ -16,7 +16,7 @@ module CreateConfig = [%graphql
 module CreateMutation = ReasonApollo.CreateMutation(CreateConfig);
 
 [@react.component]
-let make = (~surveyId, ~cardId) => {
+let make = (~surveyId, ~cardId, ~userId) => {
   <CreateMutation>
     ...{(mutate, _) => {
       <Select
@@ -44,7 +44,7 @@ let make = (~surveyId, ~cardId) => {
               CreateConfig.make(
                 ~cardId,
                 ~surveyId,
-                ~userId=Session.userId,
+                ~userId,
                 ~answer,
                 (),
               )##variables;

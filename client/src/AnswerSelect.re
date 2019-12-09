@@ -1,10 +1,11 @@
 [@react.component]
-let make = (~surveyId, ~cardId, ~answerRecord) => {
+let make = (~surveyId, ~cardId, ~userId, ~answerRecord) => {
   switch (answerRecord) {
   | None =>
     <CreateSelect
       surveyId
       cardId
+      userId
     />
   | Some(record) =>
     <UpdateSelect

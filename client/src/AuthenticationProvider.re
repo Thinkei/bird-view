@@ -1,17 +1,16 @@
 [@react.component]
 let make = (~children) => {
   open Session;
-  let (token, setToken) = React.useState(() => getTokenFromStorage());
-  Js.log(token);
+  let (session, setSession) = React.useState(() => getSessionFromStorage());
 
-  switch (token) {
+  switch (session) {
   | Invalid =>
     <SignIn
-      setToken={newToken => {
-        setToken(_ => Valid(newToken));
-        setTokenToStorage(newToken);
+      setSesion={session => {
+        setSession(_ => Valid(session));
+        setSessionToStorage(session);
       }}
     />
-  | Valid(_) => children
+  | Valid(session) => children(session)
   };
 };

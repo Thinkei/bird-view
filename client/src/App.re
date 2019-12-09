@@ -10,12 +10,14 @@ let make = () =>
   <AppRouter>
     {currentRoute =>
        <AuthenticationProvider>
-         {Route.Config.(
-            switch (currentRoute) {
-            | Home => <Home />
-            | SurveyDetail(id) => <SurveyDetail id />
-            | NotFound => <div> {ReasonReact.string("Not Found")} </div>
-            }
-          )}
+         {session => {
+            Route.Config.(
+              switch (currentRoute) {
+              | Home => <SurveysList session />
+              | SurveyDetail(id) => <SurveyDetail id session />
+              | NotFound => <div> {ReasonReact.string("Not Found")} </div>
+              }
+            );
+          }}
        </AuthenticationProvider>}
   </AppRouter>;

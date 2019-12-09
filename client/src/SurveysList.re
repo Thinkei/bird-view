@@ -74,19 +74,31 @@ module QueryConfig = [%graphql
 
 module Query = ReasonApolloHooks.Query.Make(QueryConfig);
 
-[@react.component]
-let make = () => {
-  let squadId = Session.squadId;
-  let variables = QueryConfig.make(~squadId, ())##variables;
-  let (queryState, _full) = Query.use(~variables, ());
+module NotAMemberOfAnySquad = {
+  [@react.component]
+  let make = () =>
+    <div> {"You doesn't belong to any squad" |> ReasonReact.string} </div>;
+};
 
-  <div>
-    <Headline> {str("YOUR BIRDVIEW SURVEYS")} </Headline>
-    {switch (queryState) {
-     | Loading => <Spinner />
-     | Data(data) => <SurveysList data={data##allSurveys |> Array.to_list} />
-     | NoData => <EmptyData />
-     | Error(e) => <FriendlyError message=e##message />
-     }}
-  </div>;
+[@react.component]
+let make = (~session) => {
+  Session.(
+    switch (session.squadId) {
+    | None => <NotAMemberOfAnySquad />
+    | Some(squadId) =>
+      let variables = QueryConfig.make(~squadId, ())##variables;
+      let (queryState, _full) = Query.use(~variables, ());
+
+      <div>
+        <Headline> {str("YOUR BIRDVIEW SURVEYS")} </Headline>
+        {switch (queryState) {
+         | Loading => <Spinner />
+         | Data(data) =>
+           <SurveysList data={data##allSurveys |> Array.to_list} />
+         | NoData => <EmptyData />
+         | Error(e) => <FriendlyError message=e##message />
+         }}
+      </div>;
+    }
+  );
 };

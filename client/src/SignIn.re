@@ -19,8 +19,8 @@ module SignInConfig = [%graphql
       user {
         id
         role
-        email
         name
+        squad { id }
       }
     }
   }
@@ -38,7 +38,7 @@ type action =
   | UpdatePassword(string);
 
 [@react.component]
-let make = (~setToken) => {
+let make = (~setSesion) => {
   React.useEffect0(() => {
     Notification.warning(
       Notification.makeConfigProps(
@@ -97,7 +97,7 @@ let make = (~setToken) => {
                    switch (res) {
                    | Errors(_)
                    | EmptyResponse =>
-                     Notification.success(
+                     Notification.error(
                        Notification.makeConfigProps(
                          ~message="Something went wrong!",
                          (),
@@ -105,16 +105,23 @@ let make = (~setToken) => {
                      )
                      |> ignore
                    | Data(data) =>
-                     switch (data##signinUser##token) {
-                     | None =>
-                       Notification.success(
+                     open Session;
+                     switch (data##signinUser##token, data##signinUser##user) {
+                     | (Some(tk), Some(user)) =>
+                       setSesion({
+                         token: tk,
+                         role: user##role,
+                         userId: user##id,
+                         squadId: Belt.Option.map(user##squad, squad => squad##id),
+                       })
+                     | (_, _) =>
+                       Notification.error(
                          Notification.makeConfigProps(
                            ~message="Something went wrong!",
                            (),
                          ),
                        )
                        |> ignore
-                     | Some(tk) => setToken(tk)
                      };
                      Notification.success(
                        Notification.makeConfigProps(

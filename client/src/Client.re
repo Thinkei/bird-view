@@ -9,13 +9,13 @@ let httpLink =
 let headerContextLink =
   ApolloLinks.createContextLink(() => {
     Session.(
-      switch (getTokenFromStorage()) {
+      switch (getSessionFromStorage()) {
       | Invalid => {
           "headers": {
             "authorization": "",
           },
         }
-      | Valid(token) => {
+      | Valid({token}) => {
           "headers": {
             "authorization": {j|Bearer $token|j},
           },

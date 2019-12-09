@@ -13352,6 +13352,29 @@
         },
         {
           "inputFields": null,
+          "name": "LoggedInUserPayload",
+          "description": "LoggedInUserPayload",
+          "interfaces": [],
+          "enumValues": null,
+          "fields": [
+            {
+              "name": "id",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "args": [],
+              "type": {
+                "kind": "SCALAR",
+                "name": "ID",
+                "ofType": null
+              }
+            }
+          ],
+          "kind": "OBJECT",
+          "possibleTypes": null
+        },
+        {
+          "inputFields": null,
           "name": "Node",
           "description": "An object with an ID",
           "interfaces": null,
@@ -14683,6 +14706,22 @@
                 "kind": "OBJECT",
                 "name": "User",
                 "ofType": null
+              }
+            },
+            {
+              "name": "loggedInUser",
+              "description": "loggedInUser",
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "OBJECT",
+                  "name": "LoggedInUserPayload",
+                  "ofType": null
+                }
               }
             },
             {

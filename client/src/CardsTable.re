@@ -20,7 +20,7 @@ let rec findAnswerRecord = cardId =>
 
 module RenderByTable = {
   [@react.component]
-  let make = (~data, ~answerRecords, ~surveyId) => {
+  let make = (~data, ~answerRecords, ~surveyId, ~userId) => {
     <div>
       <Headline>
         <span> {str("ANSWER SHEET: ")} </span>
@@ -53,7 +53,7 @@ module RenderByTable = {
                   <TableData> {rowData##goodExample |> str} </TableData>
                   <TableData> {rowData##badExample |> str} </TableData>
                   <TableData>
-                    <AnswerSelect surveyId answerRecord cardId=rowData##id />
+                    <AnswerSelect surveyId answerRecord cardId=rowData##id userId/>
                   </TableData>
                 </TableRow>;
               })
@@ -68,9 +68,9 @@ module RenderByTable = {
 module Query = ReasonApolloHooks.Query.Make(QueryConfig);
 
 [@react.component]
-let make = (~data, ~surveyId) => {
+let make = (~data, ~surveyId, ~userId) => {
   let variables =
-    QueryConfig.make(~surveyId, ~userId=Session.userId, ())##variables;
+    QueryConfig.make(~surveyId, ~userId, ())##variables;
   let (queryState, _full) = Query.use(~variables, ());
 
   switch (queryState) {
@@ -79,9 +79,10 @@ let make = (~data, ~surveyId) => {
     <RenderByTable
       surveyId
       data
+      userId
       answerRecords={res##allAnswerRecords |> Array.to_list}
     />
-  | NoData => <RenderByTable surveyId data answerRecords=[] />
+  | NoData => <RenderByTable surveyId data userId answerRecords=[] />
   | Error(e) => <FriendlyError message=e##message />
   };
 };
