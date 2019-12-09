@@ -41,7 +41,7 @@ let make = (~squadId) => {
                  | Data(_) =>
                    Notification.success(
                      Notification.makeConfigProps(
-                       ~message="Create new survey success",
+                       ~message="Create new survey successfully!",
                        (),
                      ),
                    )
