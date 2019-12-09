@@ -1,69 +1,57 @@
+open Ehd;
 let str = ReasonReact.string;
 
 let optionStr =
   fun
-  | None => str("")
-  | Some(v) => str(v);
+  | None => ""
+  | Some(v) => v;
 
-module TableConfig = {
-  type squad = {. "name": string};
-
-  type rowData = {
-    .
-    "id": string,
-    "createdAt": Js.Json.t,
-    "name": string,
-    "squad": squad,
+module SurveysList = {
+  [@react.component]
+  let make = (~data) => {
+    <div>
+      <Table>
+        <thead>
+          <TableRow>
+            <TableHeader> {"Created At" |> str} </TableHeader>
+            <TableHeader> {"Squad Name" |> str} </TableHeader>
+            <TableHeader> {"Action" |> str} </TableHeader>
+          </TableRow>
+        </thead>
+        <tbody>
+          {data
+           |> List.map(rowData => {
+                <TableRow>
+                  <TableData>
+                    {rowData##createdAt
+                     |> Js.Json.decodeString
+                     |> optionStr
+                     |> Utils.formatDate
+                     |> str}
+                  </TableData>
+                  <TableData> {rowData##squad##name |> str} </TableData>
+                  <TableData>
+                    <Route.Link
+                      route=Route.Config.(SurveyDetail(rowData##id))>
+                      <Button> {"Detail" |> str} </Button>
+                    </Route.Link>
+                  </TableData>
+                </TableRow>
+              })
+           |> Array.of_list
+           |> ReasonReact.array}
+        </tbody>
+      </Table>
+    </div>;
   };
-
-  type column =
-    | CreatedAt
-    | Name
-    | SquadName
-    | Action;
-
-  let getColumnHeader =
-    fun
-    | CreatedAt => "Created At"
-    | Name => "Survey Name"
-    | SquadName => "Squad Name"
-    | Action => "Action";
-
-  let render = (data, column) =>
-    switch (column) {
-    | CreatedAt => data##createdAt |> Js.Json.decodeString |> optionStr
-    | Name => data##name |> str
-    | SquadName => data##squad##name |> str
-    | Action =>
-      <Route.Link
-        className=TW.(
-          [
-            BackgroundColor(BgBlue500),
-            BackgroundColor(HoverBgBlue700),
-            TextColor(TextWhite),
-            Padding(Py2),
-            Padding(Px4),
-            BorderRadius(Rounded),
-          ]
-          |> make
-        )
-        route=Route.Config.(SurveyDetail(data##id))>
-        {str("Detail")}
-      </Route.Link>
-    };
-
-  let columns = [CreatedAt, Name, SquadName, Action];
 };
-
-module SurveysList = CreateTable.Make(TableConfig);
 
 module QueryConfig = [%graphql
   {|
     query allSurveys($squadId: ID) {
-      allSurveys(filter: { squad: { id: $squadId}}) {
+      allSurveys(filter: { squad: { id: $squadId}}, orderBy: createdAt_DESC) {
         id
         createdAt
-        name
         squad {
           name
         }
@@ -94,7 +82,14 @@ let make = (~session) => {
         {switch (queryState) {
          | Loading => <Spinner />
          | Data(data) =>
-           <SurveysList data={data##allSurveys |> Array.to_list} />
+           <div>
+             {switch (session.squadId, session.role) {
+              | (Some(squadId), Some(`Leader)) =>
+                <CreateNewSurveyButton squadId />
+              | (_, _) => ReasonReact.null
+              }}
+             <SurveysList data={data##allSurveys |> Array.to_list} />
+           </div>
          | NoData => <EmptyData />
          | Error(e) => <FriendlyError message=e##message />
          }}
