@@ -21,7 +21,9 @@
     "reason-apollo-hooks",
     "reason-apollo",
     "re-tailwind",
-    "bs-log"
+    "bs-log",
+    "bs-css",
+    "bs-eh-design"
   ],
   "ppx-flags": ["@baransu/graphql_ppx_re/ppx6", "bs-log/ppx"],
   "warnings": {

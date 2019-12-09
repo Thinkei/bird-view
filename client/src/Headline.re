@@ -1,10 +1,10 @@
+open Ehd;
+
 [@react.component]
 let make = (~children) => {
-  <h2
-    className=TW.(
-      [TextAlign(TextCenter), Margin(My2), TextTransform(Uppercase)]
-      |> make
-    )>
+  <Typography.Title
+    level=1
+    style={ReactDOMRe.Style.make(~marginTop="20px", ~textAlign="center", ())}>
     children
-  </h2>;
+  </Typography.Title>;
 };

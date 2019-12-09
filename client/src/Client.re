@@ -1,7 +1,32 @@
 let inMemoryCache = ApolloInMemoryCache.createInMemoryCache();
 
 let httpLink =
-  ApolloLinks.createHttpLink(~uri="https://api.graph.cool/simple/v1/ck3swt8le9sal0119fx4dpb74", ());
+  ApolloLinks.createHttpLink(
+    ~uri="https://api.graph.cool/simple/v1/ck3swt8le9sal0119fx4dpb74",
+    (),
+  );
+
+let headerContextLink =
+  ApolloLinks.createContextLink(() => {
+    Session.(
+      switch (getTokenFromStorage()) {
+      | Invalid => {
+          "headers": {
+            "authorization": "",
+          },
+        }
+      | Valid(token) => {
+          "headers": {
+            "authorization": {j|Bearer $token|j},
+          },
+        }
+      }
+    )
+  });
 
 let instance =
-  ReasonApollo.createApolloClient(~link=httpLink, ~cache=inMemoryCache, ());
+  ReasonApollo.createApolloClient(
+    ~link=ApolloLinks.from([|headerContextLink, httpLink|]),
+    ~cache=inMemoryCache,
+    (),
+  );
