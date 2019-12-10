@@ -113,7 +113,7 @@ module ReportTable = {
                           | None => ReactDOMRe.Style.make()
                           };
                         <TableData style>
-                          {answer->Belt.Option.mapWithDefault("Not yet answer", answerToJs)
+                          {answer->Belt.Option.mapWithDefault("Not yet answered", answerToJs)
                            |> str}
                         </TableData>;
                       })
