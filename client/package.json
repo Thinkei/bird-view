@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "start": "BS_LOG=* bsb -clean -make-world -w",
-    "dev": "parcel ./index.html"
+    "dev": "parcel ./index.html",
+    "now-build": "bsb -clean -make-world && npm run build"
   },
   "devDependencies": {
     "bs-log": "^1.0.0",
