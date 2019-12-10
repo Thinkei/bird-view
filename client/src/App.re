@@ -36,6 +36,11 @@ let make = () =>
                    switch (currentRoute) {
                    | Home => <SurveysList session />
                    | SurveyDetail(id) => <SurveyDetail id session />
+                   | SurveyReport(id) =>
+                     switch (session.role) {
+                     | Some(`Leader) => <SurveyReport id session />
+                     | _ => <FriendlyError message="Unauthorized" />
+                     }
                    | NotFound =>
                      <div> {ReasonReact.string("Not Found")} </div>
                    }

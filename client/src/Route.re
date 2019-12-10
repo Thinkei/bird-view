@@ -9,6 +9,7 @@ module Config = {
   type route =
     | Home
     | SurveyDetail(string)
+    | SurveyReport(string)
     | NotFound;
 
   let toRoute = (url: ReasonReact.Router.url) => {
@@ -19,7 +20,8 @@ module Config = {
     | ["/"] =>
       switch (hashes) {
       | [""] => Home
-      | ["", "surveys", birdViewId] => SurveyDetail(birdViewId)
+      | ["", "surveys", surveyId] => SurveyDetail(surveyId)
+      | ["", "reports", surveyId] => SurveyReport(surveyId)
       | _ => NotFound
       }
     | _ => NotFound
@@ -30,6 +32,7 @@ module Config = {
     fun
     | Home => "#"
     | SurveyDetail(id) => "#/surveys/" ++ id
+    | SurveyReport(id) => "#/reports/" ++ id
     | NotFound => "#/404";
 };
 

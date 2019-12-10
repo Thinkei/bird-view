@@ -1,6 +1,7 @@
 [@react.component]
-let make = (~children) => {
+let make = (~children, ~style=?) => {
   <td
+    ?style
     className=TW.(
       [
         Padding(Py4),

@@ -8,7 +8,7 @@ let optionStr =
 
 module SurveysList = {
   [@react.component]
-  let make = (~data) => {
+  let make = (~data, ~isLeader) => {
     <div>
       <Table>
         <thead>
@@ -33,8 +33,18 @@ module SurveysList = {
                   <TableData>
                     <Route.Link
                       route=Route.Config.(SurveyDetail(rowData##id))>
-                      <Button> {"Detail" |> str} </Button>
+                      <Button _type=`primary> {"Answer" |> str} </Button>
                     </Route.Link>
+                    {isLeader
+                       ? <Route.Link
+                           style={ReactDOMRe.Style.make(
+                             ~marginLeft="5px",
+                             (),
+                           )}
+                           route=Route.Config.(SurveyReport(rowData##id))>
+                           <Button> {"View report" |> str} </Button>
+                         </Route.Link>
+                       : ReasonReact.null}
                   </TableData>
                 </TableRow>
               })
@@ -62,17 +72,11 @@ module QueryConfig = [%graphql
 
 module Query = ReasonApolloHooks.Query.Make(QueryConfig);
 
-module NotAMemberOfAnySquad = {
-  [@react.component]
-  let make = () =>
-    <div> {"You doesn't belong to any squad" |> ReasonReact.string} </div>;
-};
-
 [@react.component]
 let make = (~session) => {
   Session.(
     switch (session.squadId) {
-    | None => <NotAMemberOfAnySquad />
+    | None => <FriendlyError message="You doesn't belong to any squad" />
     | Some(squadId) =>
       let variables = QueryConfig.make(~squadId, ())##variables;
       let (queryState, _full) = Query.use(~variables, ());
@@ -88,7 +92,15 @@ let make = (~session) => {
                 <CreateNewSurveyButton squadId />
               | (_, _) => ReasonReact.null
               }}
-             <SurveysList data={data##allSurveys |> Array.to_list} />
+             <SurveysList
+               data={data##allSurveys |> Array.to_list}
+               isLeader={
+                 switch (session.role) {
+                 | Some(`Leader) => true
+                 | _ => false
+                 }
+               }
+             />
            </div>
          | NoData => <EmptyData />
          | Error(e) => <FriendlyError message=e##message />

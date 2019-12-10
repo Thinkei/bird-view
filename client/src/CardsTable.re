@@ -52,8 +52,14 @@ module RenderByTable = {
                   <TableData> {rowData##description |> str} </TableData>
                   <TableData> {rowData##goodExample |> str} </TableData>
                   <TableData> {rowData##badExample |> str} </TableData>
-                  <TableData>
-                    <AnswerSelect surveyId answerRecord cardId=rowData##id userId/>
+                  <TableData
+                    style={ReactDOMRe.Style.make(~minWidth="220px", ())}>
+                    <AnswerSelect
+                      surveyId
+                      answerRecord
+                      cardId=rowData##id
+                      userId
+                    />
                   </TableData>
                 </TableRow>;
               })
@@ -69,8 +75,7 @@ module Query = ReasonApolloHooks.Query.Make(QueryConfig);
 
 [@react.component]
 let make = (~data, ~surveyId, ~userId) => {
-  let variables =
-    QueryConfig.make(~surveyId, ~userId, ())##variables;
+  let variables = QueryConfig.make(~surveyId, ~userId, ())##variables;
   let (queryState, _full) = Query.use(~variables, ());
 
   switch (queryState) {
