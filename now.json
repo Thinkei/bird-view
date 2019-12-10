@@ -2,10 +2,18 @@
   "version": 2,
   "name": "bird-view",
   "public": false,
+  "env": {
+    "EH_NPM_TOKEN": "@eh-npm-token"
+  },
   "builds": [
     { "src": "client/package.json", "use": "@now/static-build" }
   ],
   "routes": [
     { "src": "/(.*)", "dest": "client/$1" }
-  ]
+  ],
+  "build": {
+    "env": {
+      "EH_NPM_TOKEN": "@eh-npm-token"
+    }
+  }
 }
