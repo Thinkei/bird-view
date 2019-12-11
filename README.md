@@ -15,18 +15,18 @@ cd client
 Install all necessary dependencies.
 
 ```
-npm install
+yarn install
 ```
 
 Start the development server to serve the page at http://localhost:1234
 
 
 ```
-npm run dev
+yarn dev
 ```
 
 Watch & build your ReasonML file change
 
 ```
-npm start
+yarn start
 ```
