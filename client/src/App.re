@@ -1,5 +1,6 @@
 [%bs.raw {|require("tailwindcss/dist/tailwind.min.css")|}];
 [%bs.raw {|require("@ehrocks/eh-ant-design/styles/eh-ant-design.css")|}];
+[%bs.raw {|require("antd/dist/antd.css")|}];
 
 open Ehd;
 

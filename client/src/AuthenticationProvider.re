@@ -5,10 +5,11 @@ let make = (~children) => {
 
   switch (session) {
   | Invalid =>
-    <SignIn
-      setSesion={session => {
+    <SignInOrSignUp
+      setSession={session => {
         setSession(_ => Valid(session));
         setSessionToStorage(session);
+        Utils.refreshPage();
       }}
     />
   | Valid(session) => children(session)

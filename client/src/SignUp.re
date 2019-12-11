@@ -11,44 +11,29 @@ let sider = ReactDOMRe.Style.make(~lineHeight="120px", ());
 let content =
   ReactDOMRe.Style.make(~minHeight="120px", ~lineHeight="120px", ());
 
-module SignInConfig = [%graphql
+module SignUpConfig = [%graphql
   {|
-  mutation signinUser($email: String!, $password: String!) {
-    signinUser(email: { email: $email, password: $password }) {
-      token
-      user {
-        id
-        role
-        name
-        squad { id }
-      }
+  mutation signUp($email: String!, $password: String!) {
+    createUser(authProvider: {email: {email: $email, password: $password }}) {
+      id
     }
   }
 |}
 ];
 
-module SignInMutation = ReasonApollo.CreateMutation(SignInConfig);
+module SignUpMutation = ReasonApollo.CreateMutation(SignUpConfig);
 
 type state = {
   email: string,
   password: string,
 };
+
 type action =
   | UpdateEmail(string)
   | UpdatePassword(string);
 
 [@react.component]
-let make = (~setSession) => {
-  React.useEffect0(() => {
-    Notification.warning(
-      Notification.makeConfigProps(
-        ~message="You need to sign in to continue!",
-        (),
-      ),
-    );
-    None;
-  });
-
+let make = (~onSignUpSuccess) => {
   let (state, dispatch) =
     React.useReducer(
       state =>
@@ -58,11 +43,11 @@ let make = (~setSession) => {
       {email: "", password: ""},
     );
 
-  <SignInMutation>
+  <SignUpMutation>
     ...{(mutate, {result}) => {
       <div style=layoutWrapper>
         <Card
-          title="Sign In" style={ReactDOMRe.Style.make(~width="300px", ())}>
+          title="Sign Up" style={ReactDOMRe.Style.make(~width="300px", ())}>
           <form>
             <Input
               _type="email"
@@ -88,7 +73,7 @@ let make = (~setSession) => {
               onClick={e => {
                 ReactEvent.Synthetic.preventDefault(e);
                 let signinVariables =
-                  SignInConfig.make(
+                  SignUpConfig.make(
                     ~email=state.email,
                     ~password=state.password,
                     (),
@@ -99,29 +84,16 @@ let make = (~setSession) => {
                      switch (res) {
                      | Errors(_)
                      | EmptyResponse =>
-                       Js.log("error");
                        Notification.error(
                          Notification.makeConfigProps(
                            ~message="Something went wrong!",
                            (),
                          ),
                        )
-                       |> ignore;
+                       |> ignore
                      | Data(data) =>
-                       open Session;
-                       switch (
-                         data##signinUser##token,
-                         data##signinUser##user,
-                       ) {
-                       | (Some(tk), Some(user)) =>
-                         setSession({
-                           token: tk,
-                           role: user##role,
-                           userId: user##id,
-                           squadId:
-                             Belt.Option.map(user##squad, squad => squad##id),
-                         })
-                       | (_, _) =>
+                       switch (data##createUser) {
+                       | None =>
                          Notification.error(
                            Notification.makeConfigProps(
                              ~message="Something went wrong!",
@@ -129,14 +101,13 @@ let make = (~setSession) => {
                            ),
                          )
                          |> ignore
-                       };
-                       Notification.success(
-                         Notification.makeConfigProps(
-                           ~message="Sign in successfully",
-                           (),
-                         ),
-                       )
-                       |> ignore;
+                       | Some(user) =>
+                         onSignUpSuccess(
+                           state.email,
+                           state.password,
+                           user##id,
+                         )
+                       }
                      };
                      Js.Promise.resolve();
                    })
@@ -145,11 +116,11 @@ let make = (~setSession) => {
               loading={Button.LoadingProp.Bool(result == Loading)}
               htmlType="submit"
               _type=`primary>
-              {str("Sign in")}
+              {str("Next")}
             </Button>
           </form>
         </Card>
       </div>
     }}
-  </SignInMutation>;
+  </SignUpMutation>;
 };

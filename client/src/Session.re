@@ -53,4 +53,8 @@ let getSessionFromStorage = () => {
   };
 };
 
-let clearSession = () => LocalStorage.removeItem(tokenKey);
+let clearSession = () => {
+  [tokenKey, roleKey, userIdKey, squadIdKey]
+  |> List.map(LocalStorage.removeItem)
+  |> ignore;
+};
