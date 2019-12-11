@@ -76,7 +76,10 @@ module Query = ReasonApolloHooks.Query.Make(QueryConfig);
 let make = (~session) => {
   Session.(
     switch (session.squadId) {
-    | None => <FriendlyError message="You doesn't belong to any squad" />
+    | None =>
+      <FriendlyError
+        message="You doesn't belong to any squad. Contact Hieu Pham to assign you into a squad!"
+      />
     | Some(squadId) =>
       let variables = QueryConfig.make(~squadId, ())##variables;
       let (queryState, _full) = Query.use(~variables, ());
