@@ -82,6 +82,10 @@ let make = (~setSession) => {
                 e->ReactEvent.Form.target##value->UpdatePassword->dispatch
               }
             />
+            {switch (result) {
+             | Error(e) => <ErrorAlert message=e##message />
+             | _ => React.null
+             }}
             <br />
             <br />
             <Button
@@ -99,14 +103,13 @@ let make = (~setSession) => {
                      switch (res) {
                      | Errors(_)
                      | EmptyResponse =>
-                       Js.log("error");
                        Notification.error(
                          Notification.makeConfigProps(
                            ~message="Something went wrong!",
                            (),
                          ),
                        )
-                       |> ignore;
+                       |> ignore
                      | Data(data) =>
                        open Session;
                        switch (

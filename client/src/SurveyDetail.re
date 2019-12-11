@@ -21,11 +21,15 @@ let make = (~id, ~session) => {
   switch (queryState) {
   | Loading => <Spinner />
   | Data(data) =>
-    <CardsTable
-      surveyId=id
-      data={data##allCards |> Array.to_list}
-      userId={session.userId}
-    />
+    switch (data##allCards |> Belt.Array.size) {
+    | 0 => <Ehd.Empty />
+    | _ =>
+      <CardsTable
+        surveyId=id
+        data={data##allCards |> Array.to_list}
+        userId={session.userId}
+      />
+    }
   | NoData => <EmptyData />
   | Error(e) => <FriendlyError message=e##message />
   };

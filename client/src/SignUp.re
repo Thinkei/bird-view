@@ -67,6 +67,10 @@ let make = (~onSignUpSuccess) => {
                 e->ReactEvent.Form.target##value->UpdatePassword->dispatch
               }
             />
+            {switch (result) {
+             | Error(e) => <ErrorAlert message=e##message />
+             | _ => React.null
+             }}
             <br />
             <br />
             <Button

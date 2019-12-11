@@ -92,15 +92,19 @@ let make = (~session) => {
                 <CreateNewSurveyButton squadId />
               | (_, _) => ReasonReact.null
               }}
-             <SurveysList
-               data={data##allSurveys |> Array.to_list}
-               isLeader={
-                 switch (session.role) {
-                 | Some(`Leader) => true
-                 | _ => false
-                 }
-               }
-             />
+             {switch (data##allSurveys |> Belt.Array.size) {
+              | 0 => <Ehd.Empty />
+              | _ =>
+                <SurveysList
+                  data={data##allSurveys |> Array.to_list}
+                  isLeader={
+                    switch (session.role) {
+                    | Some(`Leader) => true
+                    | _ => false
+                    }
+                  }
+                />
+              }}
            </div>
          | NoData => <EmptyData />
          | Error(e) => <FriendlyError message=e##message />
