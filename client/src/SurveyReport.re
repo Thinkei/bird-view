@@ -28,6 +28,8 @@ type card = {
   id: string,
   description: string,
   answerRecords: option(array(answerRecord)),
+  goodExample: string,
+  badExample: string,
 };
 
 module QueryConfig = [%graphql
@@ -36,6 +38,8 @@ module QueryConfig = [%graphql
     allCards @bsRecord {
       id
       description
+      goodExample
+      badExample
       answerRecords(filter: { survey: { id: $surveyId }}) @bsRecord {
         answer
         user @bsRecord {
@@ -94,7 +98,23 @@ module ReportTable = {
           {cards
            |> Array.map(card => {
                 <TableRow>
-                  <TableData> {card.description |> str} </TableData>
+                  <TableData>
+                    <Ehd.Tooltip
+                      title={
+                        <div>
+                          <p>
+                            <strong> {"Example of Awesome: " |> str} </strong>
+                            <span> {card.goodExample |> str} </span>
+                          </p>
+                          <p>
+                            <strong> {"Example of Crappy: " |> str} </strong>
+                            <span> {card.badExample |> str} </span>
+                          </p>
+                        </div>
+                      }>
+                      <strong> {str(card.description)} </strong>
+                    </Ehd.Tooltip>
+                  </TableData>
                   {users
                    |> Array.map((user: user) => {
                         let answer =
@@ -105,15 +125,27 @@ module ReportTable = {
                         let style =
                           switch (answer) {
                           | Some(`Red) =>
-                            ReactDOMRe.Style.make(~backgroundColor="#ffc4c4", ())
+                            ReactDOMRe.Style.make(
+                              ~backgroundColor="#ffc4c4",
+                              (),
+                            )
                           | Some(`Green) =>
-                            ReactDOMRe.Style.make(~backgroundColor="#98e998", ())
+                            ReactDOMRe.Style.make(
+                              ~backgroundColor="#98e998",
+                              (),
+                            )
                           | Some(`Yellow) =>
-                            ReactDOMRe.Style.make(~backgroundColor="#efef9b", ())
+                            ReactDOMRe.Style.make(
+                              ~backgroundColor="#efef9b",
+                              (),
+                            )
                           | None => ReactDOMRe.Style.make()
                           };
                         <TableData style>
-                          {answer->Belt.Option.mapWithDefault("Not yet answer", answerToJs)
+                          {answer->Belt.Option.mapWithDefault(
+                             "Not yet answer",
+                             answerToJs,
+                           )
                            |> str}
                         </TableData>;
                       })

@@ -1,5 +1,5 @@
 
-let nonEmptyString = value => value == "";
+let nonEmptyString = value => value != "";
 
 let validEmail = str =>
   Js.Re.fromString("^[^@\\s]+@([^@\\s]+\\.)+[^@\\W]+$")
