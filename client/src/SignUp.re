@@ -76,28 +76,40 @@ let make = (~onSignUpSuccess) => {
             <Button
               onClick={e => {
                 ReactEvent.Synthetic.preventDefault(e);
-                let signinVariables =
-                  SignUpConfig.make(
-                    ~email=state.email,
-                    ~password=state.password,
-                    (),
-                  )##variables;
 
-                mutate(~variables=signinVariables, ())
-                |> Js.Promise.then_(res => {
-                     switch (res) {
-                     | Errors(_)
-                     | EmptyResponse =>
-                       Notification.error(
-                         Notification.makeConfigProps(
-                           ~message="Something went wrong!",
-                           (),
-                         ),
-                       )
-                       |> ignore
-                     | Data(data) =>
-                       switch (data##createUser) {
-                       | None =>
+                switch (
+                  FormValidation.validEmail(state.email),
+                  FormValidation.nonEmptyString(state.password),
+                ) {
+                | (false, _) =>
+                  Notification.error(
+                    Notification.makeConfigProps(
+                      ~message="Invalid email",
+                      (),
+                    ),
+                  )
+                  |> ignore
+                | (_, false) =>
+                  Notification.error(
+                    Notification.makeConfigProps(
+                      ~message="Require non-empty password",
+                      (),
+                    ),
+                  )
+                  |> ignore
+                | _ =>
+                  let signinVariables =
+                    SignUpConfig.make(
+                      ~email=state.email,
+                      ~password=state.password,
+                      (),
+                    )##variables;
+
+                  mutate(~variables=signinVariables, ())
+                  |> Js.Promise.then_(res => {
+                       switch (res) {
+                       | Errors(_)
+                       | EmptyResponse =>
                          Notification.error(
                            Notification.makeConfigProps(
                              ~message="Something went wrong!",
@@ -105,17 +117,28 @@ let make = (~onSignUpSuccess) => {
                            ),
                          )
                          |> ignore
-                       | Some(user) =>
-                         onSignUpSuccess(
-                           state.email,
-                           state.password,
-                           user##id,
-                         )
-                       }
-                     };
-                     Js.Promise.resolve();
-                   })
-                |> ignore;
+                       | Data(data) =>
+                         switch (data##createUser) {
+                         | None =>
+                           Notification.error(
+                             Notification.makeConfigProps(
+                               ~message="Something went wrong!",
+                               (),
+                             ),
+                           )
+                           |> ignore
+                         | Some(user) =>
+                           onSignUpSuccess(
+                             state.email,
+                             state.password,
+                             user##id,
+                           )
+                         }
+                       };
+                       Js.Promise.resolve();
+                     })
+                  |> ignore;
+                };
               }}
               loading={Button.LoadingProp.Bool(result == Loading)}
               htmlType="submit"

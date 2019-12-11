@@ -91,40 +91,40 @@ let make = (~setSession) => {
             <Button
               onClick={e => {
                 ReactEvent.Synthetic.preventDefault(e);
-                let signinVariables =
-                  SignInConfig.make(
-                    ~email=state.email,
-                    ~password=state.password,
-                    (),
-                  )##variables;
 
-                mutate(~variables=signinVariables, ())
-                |> Js.Promise.then_(res => {
-                     switch (res) {
-                     | Errors(_)
-                     | EmptyResponse =>
-                       Notification.error(
-                         Notification.makeConfigProps(
-                           ~message="Something went wrong!",
-                           (),
-                         ),
-                       )
-                       |> ignore
-                     | Data(data) =>
-                       open Session;
-                       switch (
-                         data##signinUser##token,
-                         data##signinUser##user,
-                       ) {
-                       | (Some(tk), Some(user)) =>
-                         setSession({
-                           token: tk,
-                           role: user##role,
-                           userId: user##id,
-                           squadId:
-                             Belt.Option.map(user##squad, squad => squad##id),
-                         })
-                       | (_, _) =>
+                switch (
+                  FormValidation.validEmail(state.email),
+                  FormValidation.nonEmptyString(state.password),
+                ) {
+                | (false, _) =>
+                  Notification.error(
+                    Notification.makeConfigProps(
+                      ~message="Invalid email",
+                      (),
+                    ),
+                  )
+                  |> ignore
+                | (_, false) =>
+                  Notification.error(
+                    Notification.makeConfigProps(
+                      ~message="Require non-empty password",
+                      (),
+                    ),
+                  )
+                  |> ignore
+                | _ =>
+                  let signinVariables =
+                    SignInConfig.make(
+                      ~email=state.email,
+                      ~password=state.password,
+                      (),
+                    )##variables;
+
+                  mutate(~variables=signinVariables, ())
+                  |> Js.Promise.then_(res => {
+                       switch (res) {
+                       | Errors(_)
+                       | EmptyResponse =>
                          Notification.error(
                            Notification.makeConfigProps(
                              ~message="Something went wrong!",
@@ -132,18 +132,43 @@ let make = (~setSession) => {
                            ),
                          )
                          |> ignore
+                       | Data(data) =>
+                         open Session;
+                         switch (
+                           data##signinUser##token,
+                           data##signinUser##user,
+                         ) {
+                         | (Some(tk), Some(user)) =>
+                           setSession({
+                             token: tk,
+                             role: user##role,
+                             userId: user##id,
+                             squadId:
+                               Belt.Option.map(user##squad, squad =>
+                                 squad##id
+                               ),
+                           })
+                         | (_, _) =>
+                           Notification.error(
+                             Notification.makeConfigProps(
+                               ~message="Something went wrong!",
+                               (),
+                             ),
+                           )
+                           |> ignore
+                         };
+                         Notification.success(
+                           Notification.makeConfigProps(
+                             ~message="Sign in successfully",
+                             (),
+                           ),
+                         )
+                         |> ignore;
                        };
-                       Notification.success(
-                         Notification.makeConfigProps(
-                           ~message="Sign in successfully",
-                           (),
-                         ),
-                       )
-                       |> ignore;
-                     };
-                     Js.Promise.resolve();
-                   })
-                |> ignore;
+                       Js.Promise.resolve();
+                     })
+                  |> ignore;
+                };
               }}
               loading={Button.LoadingProp.Bool(result == Loading)}
               htmlType="submit"
