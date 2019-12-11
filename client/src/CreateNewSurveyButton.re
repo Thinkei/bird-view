@@ -22,7 +22,6 @@ let make = (~squadId) => {
     <CreateSurveyMutation>
       ...{(mutate, {result}) => {
         <Button
-          size=`xlarge
           onClick={_ => {
             let variables = CreateSurveyConfig.make(~squadId, ())##variables;
 
