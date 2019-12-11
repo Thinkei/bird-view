@@ -82,6 +82,16 @@ module ReportTable = {
     let emailHandlers =
       users |> Array.map(user => user.email->matchFirst(extractEmailRegex));
     <div>
+      <Route.Link
+        style={ReactDOMRe.Style.make(
+          ~position="absolute",
+          ~top="10px",
+          ~left="10px",
+          (),
+        )}
+        route=Route.Config.(Home)>
+        <Ehd.Button> {"View all surveys" |> React.string} </Ehd.Button>
+      </Route.Link>
       <Headline> {str("SURVEY REPORT")} </Headline>
       <Table>
         <thead>
