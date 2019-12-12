@@ -18,11 +18,13 @@ module CreateSurveyMutation = ReasonApollo.CreateMutation(CreateSurveyConfig);
 
 [@react.component]
 let make = (~squadId) => {
+  let (createdSurvey, setCreatedSurvey) = React.useState(() => false);
+
   <div className=TW.([Padding(Py2)] |> make)>
     <CreateSurveyMutation>
       ...{(mutate, {result}) => {
-        <Button
-          onClick={_ => {
+        <Popconfirm
+          onConfirm={_ => {
             let variables = CreateSurveyConfig.make(~squadId, ())##variables;
 
             mutate(~variables, ~refetchQueries=[|"allSurveys"|], ())
@@ -38,22 +40,33 @@ let make = (~squadId) => {
                    )
                    |> ignore
                  | Data(_) =>
+                   setCreatedSurvey(_ => true);
                    Notification.success(
                      Notification.makeConfigProps(
                        ~message="Create new survey successfully!",
                        (),
                      ),
                    )
-                   |> ignore
+                   |> ignore;
                  };
                  Js.Promise.resolve();
                })
             |> ignore;
           }}
-          loading={Button.LoadingProp.Bool(result == Loading)}
-          _type=`primary>
-          {"Create new survey" |> ReasonReact.string}
-        </Button>
+          title={
+            (
+              createdSurvey
+                ? "Are you sure you want to create more survey?"
+                : "Create survey and send email to your squad members?"
+            )
+            |> React.string
+          }>
+          <Button
+            loading={Button.LoadingProp.Bool(result == Loading)}
+            _type=`primary>
+            {"Create new survey" |> ReasonReact.string}
+          </Button>
+        </Popconfirm>
       }}
     </CreateSurveyMutation>
   </div>;

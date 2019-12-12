@@ -1101,6 +1101,16 @@
         {
           "inputFields": [
             {
+              "name": "enabled",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "squadId",
               "description": "",
               "type": {
@@ -2659,6 +2669,16 @@
         },
         {
           "inputFields": [
+            {
+              "name": "enabled",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
             {
               "name": "squadId",
               "description": "",
@@ -4595,6 +4615,16 @@
               "deprecationReason": null,
               "args": [
                 {
+                  "name": "enabled",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "squadId",
                   "description": null,
                   "type": {
@@ -4971,6 +5001,16 @@
               "isDeprecated": false,
               "deprecationReason": null,
               "args": [
+                {
+                  "name": "enabled",
+                  "description": null,
+                  "type": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  },
+                  "defaultValue": null
+                },
                 {
                   "name": "id",
                   "description": null,
@@ -6881,6 +6921,16 @@
         {
           "inputFields": [
             {
+              "name": "enabled",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
               "name": "answerRecordsIds",
               "description": "",
               "type": {
@@ -7093,6 +7143,22 @@
                 "ofType": {
                   "kind": "SCALAR",
                   "name": "DateTime",
+                  "ofType": null
+                }
+              }
+            },
+            {
+              "name": "enabled",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
                   "ofType": null
                 }
               }
@@ -7348,6 +7414,26 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "DateTime",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "enabled",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "enabled_not",
+              "description": "All values that are not equal to given value.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
                 "ofType": null
               },
               "defaultValue": null
@@ -8156,6 +8242,16 @@
         },
         {
           "inputFields": [
+            {
+              "name": "enabled",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
             {
               "name": "id",
               "description": "",
@@ -13104,29 +13200,6 @@
         },
         {
           "inputFields": null,
-          "name": "LoggedInUserPayload",
-          "description": "LoggedInUserPayload",
-          "interfaces": [],
-          "enumValues": null,
-          "fields": [
-            {
-              "name": "id",
-              "description": null,
-              "isDeprecated": false,
-              "deprecationReason": null,
-              "args": [],
-              "type": {
-                "kind": "SCALAR",
-                "name": "ID",
-                "ofType": null
-              }
-            }
-          ],
-          "kind": "OBJECT",
-          "possibleTypes": null
-        },
-        {
-          "inputFields": null,
           "name": "Node",
           "description": "An object with an ID",
           "interfaces": null,
@@ -14451,22 +14524,6 @@
               }
             },
             {
-              "name": "loggedInUser",
-              "description": "loggedInUser",
-              "isDeprecated": false,
-              "deprecationReason": null,
-              "args": [],
-              "type": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "LoggedInUserPayload",
-                  "ofType": null
-                }
-              }
-            },
-            {
               "name": "user",
               "description": null,
               "isDeprecated": false,
@@ -15760,6 +15817,22 @@
               }
             },
             {
+              "name": "enabled",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null,
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "Boolean",
+                  "ofType": null
+                }
+              }
+            },
+            {
               "name": "id",
               "description": null,
               "isDeprecated": false,
@@ -16039,6 +16112,26 @@
               "type": {
                 "kind": "SCALAR",
                 "name": "DateTime",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "enabled",
+              "description": "",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              },
+              "defaultValue": null
+            },
+            {
+              "name": "enabled_not",
+              "description": "All values that are not equal to given value.",
+              "type": {
+                "kind": "SCALAR",
+                "name": "Boolean",
                 "ofType": null
               },
               "defaultValue": null
@@ -16358,6 +16451,18 @@
             },
             {
               "name": "createdAt_DESC",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "enabled_ASC",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "enabled_DESC",
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null

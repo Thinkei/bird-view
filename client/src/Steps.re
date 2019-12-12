@@ -1,5 +1,3 @@
-Utils.require("antd/lib/steps/style");
-
 [@bs.module "antd/lib/steps"] [@react.component]
 external make:
   (
