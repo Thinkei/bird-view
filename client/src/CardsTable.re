@@ -48,7 +48,7 @@ module RenderByTable = {
                   | None =>
                     ReactDOMRe.Style.make(~backgroundColor="#fef1f1", ())
                   };
-                <TableRow style>
+                <TableRow style key={rowData##id}>
                   <TableData> {rowData##description |> str} </TableData>
                   <TableData> {rowData##goodExample |> str} </TableData>
                   <TableData> {rowData##badExample |> str} </TableData>

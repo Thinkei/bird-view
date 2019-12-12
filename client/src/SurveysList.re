@@ -15,13 +15,15 @@ module SurveysList = {
           <TableRow>
             <TableHeader> {"Created At" |> str} </TableHeader>
             <TableHeader> {"Squad Name" |> str} </TableHeader>
+            {isLeader
+               ? <TableHeader> {"Enabled?" |> str} </TableHeader> : React.null}
             <TableHeader> {"Action" |> str} </TableHeader>
           </TableRow>
         </thead>
         <tbody>
           {data
            |> List.map(rowData => {
-                <TableRow>
+                <TableRow key=rowData##id>
                   <TableData>
                     {rowData##createdAt
                      |> Js.Json.decodeString
@@ -30,10 +32,20 @@ module SurveysList = {
                      |> str}
                   </TableData>
                   <TableData> {rowData##squad##name |> str} </TableData>
+                  {isLeader
+                     ? <TableData>
+                         <SurveyStatusSwitch
+                           surveyId=rowData##id
+                           enabled=rowData##enabled
+                         />
+                       </TableData>
+                     : ReasonReact.null}
                   <TableData>
                     <Route.Link
                       route=Route.Config.(SurveyDetail(rowData##id))>
-                      <Button _type=`primary> {"Answer" |> str} </Button>
+                      <Button _type=`primary disabled={!rowData##enabled}>
+                        {"Answer" |> str}
+                      </Button>
                     </Route.Link>
                     {isLeader
                        ? <Route.Link
@@ -62,6 +74,7 @@ module QueryConfig = [%graphql
       allSurveys(filter: { squad: { id: $squadId}}, orderBy: createdAt_DESC) {
         id
         createdAt
+        enabled
         squad {
           name
         }
