@@ -18,8 +18,8 @@ module CreateSurveyMutation = ReasonApollo.CreateMutation(CreateSurveyConfig);
 
 let useDisclosure = () => {
   let (value, setter) = React.useState(() => false);
-  let onClose = () => setter(_ => true);
-  let onOpen = () => setter(_ => false);
+  let onClose = () => setter(_ => false);
+  let onOpen = () => setter(_ => true);
   (value, onOpen, onClose);
 };
 
@@ -36,22 +36,29 @@ let make = (~squadIds) => {
             loading={Button.LoadingProp.Bool(result == Loading || isSending)}
             onClick={_ => onOpenedModal()}
             _type=`primary>
-            {"Create new survey" |> ReasonReact.string}
+            {"Send new bird view" |> ReasonReact.string}
           </Button>
           <Modal
-            closable=true
+            closable=false
             visible=isOpenModal
+            okType={isCreatedSuvey ? `danger : `primary}
             onOk={_ => {
               onClosedModal();
               onStartSending();
 
               let sendings =
                 squadIds
-                |> List.map(squadId => {
+                |> List.mapi((index, squadId) => {
                      let variables =
                        CreateSurveyConfig.make(~squadId, ())##variables;
 
-                     mutate(~variables, ~refetchQueries=[|"allSurveys"|], ())
+                     mutate(
+                       ~variables,
+                       ~refetchQueries=
+                         index + 1 == List.length(squadIds)
+                           ? [|"allSquads"|] : [||],
+                       (),
+                     )
                      |> Js.Promise.then_(res => {
                           switch (res) {
                           | Errors(_)
@@ -64,24 +71,26 @@ let make = (~squadIds) => {
                    });
               ();
               Js.Promise.all(sendings |> Array.of_list)
-              |> Js.Promise.then_(res => {
+              |> Js.Promise.then_(_ => {
+                   onCreatedSurvey();
+                   onEndSending();
                    Notification.success(
                      Notification.makeConfigProps(
-                       ~message="Create new surveys successfully!",
+                       ~message="Create new bird view successfully!",
                        (),
                      ),
                    )
                    |> ignore;
-
                    Js.Promise.resolve();
-                 });
+                 })
+              |> ignore;
               ();
             }}
             onCancel={_ => onClosedModal()}>
             {(
                isCreatedSuvey
-                 ? "Are you sure you want to create more surveys?"
-                 : "Create survey and send email to all squads?"
+                 ? "You just created one. Are you sure you want to create another?"
+                 : "Create new bird view and send email to all squads?"
              )
              |> React.string}
           </Modal>

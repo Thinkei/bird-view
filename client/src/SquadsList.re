@@ -6,10 +6,14 @@ module QueryConfig = [%graphql
       allSquads(orderBy: name_ASC) {
         id
         name
-        users {
+        leaders: users(last: 1, filter: { role: Leader }) {
           id
-          role
           name
+          email
+        }
+        lastSurveys: surveys(last: 1) {
+          id
+          createdAt
         }
       }
     }
@@ -18,25 +22,59 @@ module QueryConfig = [%graphql
 
 module Query = ReasonApolloHooks.Query.Make(QueryConfig);
 
+let (|?) = (x, y) =>
+  switch (x) {
+  | Some(x) => x
+  | None => y
+  };
+
+let toDefaultList =
+  fun
+  | None => []
+  | Some(arr) => Array.to_list(arr);
+
 module DisplayInTable = {
   [@react.component]
   let make = (~data) => {
     <div>
+      <CreateNewSurveysButton
+        squadIds={data |> List.map(r => r##id)}
+      />
       <Table>
         <thead>
           <TableRow>
-            <TableHeader> {"Id" |> str} </TableHeader>
             <TableHeader> {"Squad Name" |> str} </TableHeader>
-            <TableHeader> {"Action" |> str} </TableHeader>
+            <TableHeader> {"Squad Lead" |> str} </TableHeader>
+            <TableHeader> {"Last Sent" |> str} </TableHeader>
           </TableRow>
         </thead>
         <tbody>
           {data
            |> List.map(rowData => {
                 <TableRow key=rowData##id>
-                  <TableData> {rowData##id |> str} </TableData>
                   <TableData> {rowData##name |> str} </TableData>
-                  <TableData> React.null </TableData>
+                  <TableData>
+                    {(
+                       switch (rowData##leaders |> toDefaultList) {
+                       | [] => "N/A"
+                       | [leader, ..._] =>
+                         leader##name |? (leader##email |? "Unknown")
+                       }
+                     )
+                     |> str}
+                  </TableData>
+                  <TableData>
+                    {(
+                       switch (rowData##lastSurveys |> toDefaultList) {
+                       | [] => "N/A"
+                       | [lastSurvey, ..._] =>
+                         lastSurvey##createdAt
+                         |> Js.Json.decodeString
+                         |> (s => s |? "" |> Utils.formatDate)
+                       }
+                     )
+                     |> str}
+                  </TableData>
                 </TableRow>
               })
            |> Array.of_list
