@@ -3,6 +3,7 @@
 [%bs.raw {|require("antd/dist/antd.css")|}];
 
 open Ehd;
+open Session;
 
 module AppRouter = Router.Create(Route.Config);
 
@@ -35,11 +36,21 @@ let make = () =>
                 </div>
                 {Route.Config.(
                    switch (currentRoute) {
-                   | Home => <SurveysList session />
+                   | Home =>
+                     switch (session.role) {
+                     | Some(`Admin) => <SquadsList />
+                     | _ =>
+                       <SurveysList
+                         squadId={session.squadId}
+                         role={session.role}
+                       />
+                     }
+
                    | SurveyDetail(id) => <SurveyDetail id session />
                    | SurveyReport(id) =>
                      switch (session.role) {
-                     | Some(`Leader) => <SurveyReport id session />
+                     | Some(`Leader)
+                     | Some(`Admin) => <SurveyReport id session />
                      | _ => <FriendlyError message="Unauthorized" />
                      }
                    | NotFound =>

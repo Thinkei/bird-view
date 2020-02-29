@@ -17,7 +17,8 @@ module CreateSurveyConfig = [%graphql
 module CreateSurveyMutation = ReasonApollo.CreateMutation(CreateSurveyConfig);
 
 [@react.component]
-let make = (~squadId) => {
+let make = () => {
+  let squadId = "1123";
   let (createdSurvey, setCreatedSurvey) = React.useState(() => false);
   let (openModal, setModalVisibility) = React.useState(() => false);
   <div className=TW.([Padding(Py2)] |> make)>

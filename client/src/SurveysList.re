@@ -8,14 +8,14 @@ let optionStr =
 
 module SurveysList = {
   [@react.component]
-  let make = (~data, ~isLeader) => {
+  let make = (~data, ~updatable) => {
     <div>
       <Table>
         <thead>
           <TableRow>
             <TableHeader> {"Created At" |> str} </TableHeader>
             <TableHeader> {"Squad Name" |> str} </TableHeader>
-            {isLeader
+            {updatable
                ? <TableHeader> {"Enabled?" |> str} </TableHeader> : React.null}
             <TableHeader> {"Action" |> str} </TableHeader>
           </TableRow>
@@ -32,7 +32,7 @@ module SurveysList = {
                      |> str}
                   </TableData>
                   <TableData> {rowData##squad##name |> str} </TableData>
-                  {isLeader
+                  {updatable
                      ? <TableData>
                          <SurveyStatusSwitch
                            surveyId=rowData##id
@@ -47,7 +47,7 @@ module SurveysList = {
                         {"Answer" |> str}
                       </Button>
                     </Route.Link>
-                    {isLeader
+                    {updatable
                        ? <Route.Link
                            style={ReactDOMRe.Style.make(
                              ~marginLeft="5px",
@@ -86,46 +86,42 @@ module QueryConfig = [%graphql
 module Query = ReasonApolloHooks.Query.Make(QueryConfig);
 
 [@react.component]
-let make = (~session) => {
-  Session.(
-    switch (session.squadId) {
-    | None =>
-      <FriendlyError
-        message="You doesn't belong to any squad. Contact Hieu Pham to assign you into a squad!"
-      />
-    | Some(squadId) =>
-      let variables = QueryConfig.make(~squadId, ())##variables;
-      let (queryState, _full) = Query.use(~variables, ());
+let make = (~squadId, ~role) => {
+  Js.log(role);
+  switch (squadId) {
+  | None =>
+    <FriendlyError
+      message="You doesn't belong to any squad. Contact Hieu Pham to assign you into a squad!"
+    />
+  | Some(squadId) =>
+    let variables = QueryConfig.make(~squadId, ())##variables;
+    let (queryState, _full) = Query.use(~variables, ());
 
-      <div>
-        <Headline> {str("YOUR BIRDVIEW SURVEYS")} </Headline>
-        {switch (queryState) {
-         | Loading => <Spinner />
-         | Data(data) =>
-           <div>
-             {switch (session.squadId, session.role) {
-              | (Some(squadId), Some(`Leader)) =>
-                <CreateNewSurveyButton squadId />
-              | (_, _) => ReasonReact.null
-              }}
-             {switch (data##allSurveys |> Belt.Array.size) {
-              | 0 => <Ehd.Empty />
-              | _ =>
-                <SurveysList
-                  data={data##allSurveys |> Array.to_list}
-                  isLeader={
-                    switch (session.role) {
-                    | Some(`Leader) => true
-                    | _ => false
-                    }
-                  }
-                />
-              }}
-           </div>
-         | NoData => <EmptyData />
-         | Error(e) => <FriendlyError message=e##message />
-         }}
-      </div>;
-    }
-  );
+    let updatable =
+      switch (role) {
+      | Some(`Leader)
+      | Some(`Admin) => true
+      | _ => false
+      };
+
+    <div>
+      <Headline> {str("YOUR BIRDVIEW SURVEYS")} </Headline>
+      {switch (queryState) {
+       | Loading => <Spinner />
+       | Data(data) =>
+         <div>
+           {switch (data##allSurveys |> Belt.Array.size) {
+            | 0 => <Ehd.Empty />
+            | _ =>
+              <SurveysList
+                data={data##allSurveys |> Array.to_list}
+                updatable
+              />
+            }}
+         </div>
+       | NoData => <EmptyData />
+       | Error(e) => <FriendlyError message=e##message />
+       }}
+    </div>;
+  };
 };

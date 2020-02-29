@@ -14583,6 +14583,12 @@
               "description": null,
               "isDeprecated": false,
               "deprecationReason": null
+            },
+            {
+              "name": "Admin",
+              "description": null,
+              "isDeprecated": false,
+              "deprecationReason": null
             }
           ],
           "fields": null,

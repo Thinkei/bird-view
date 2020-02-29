@@ -4,7 +4,11 @@ let userIdKey = "__USER_ID__";
 let squadIdKey = "__SQUAD_ID__";
 
 [@bs.deriving jsConverter]
-type role = [ | [@bs.as "Member"] `Member | [@bs.as "Leader"] `Leader];
+type role = [
+  | [@bs.as "Member"] `Member
+  | [@bs.as "Leader"] `Leader
+  | [@bs.as "Admin"] `Admin
+];
 
 type session = {
   token: string,
@@ -44,6 +48,7 @@ let getSessionFromStorage = () => {
       role:
         switch (roleAsString) {
         | Some("Leader") => Some(`Leader)
+        | Some("Admin") => Some(`Admin)
         | _ => Some(`Member)
         },
       userId,
