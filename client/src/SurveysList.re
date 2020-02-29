@@ -8,16 +8,16 @@ let optionStr =
 
 module SurveysList = {
   [@react.component]
-  let make = (~data, ~updatable) => {
+  let make = (~data, ~updatable, ~answerable, ~reportViewable) => {
     <div>
       <Table>
         <thead>
           <TableRow>
-            <TableHeader> {"Created At" |> str} </TableHeader>
+            <TableHeader> {"Sent At" |> str} </TableHeader>
             <TableHeader> {"Squad Name" |> str} </TableHeader>
             {updatable
                ? <TableHeader> {"Enabled?" |> str} </TableHeader> : React.null}
-            <TableHeader> {"Action" |> str} </TableHeader>
+            <TableHeader> {"Actions" |> str} </TableHeader>
           </TableRow>
         </thead>
         <tbody>
@@ -41,13 +41,15 @@ module SurveysList = {
                        </TableData>
                      : ReasonReact.null}
                   <TableData>
-                    <Route.Link
-                      route=Route.Config.(SurveyDetail(rowData##id))>
-                      <Button _type=`primary disabled={!rowData##enabled}>
-                        {"Answer" |> str}
-                      </Button>
-                    </Route.Link>
-                    {updatable
+                    {answerable
+                       ? <Route.Link
+                           route=Route.Config.(SurveyDetail(rowData##id))>
+                           <Button _type=`primary disabled={!rowData##enabled}>
+                             {"Answer" |> str}
+                           </Button>
+                         </Route.Link>
+                       : React.null}
+                    {reportViewable
                        ? <Route.Link
                            style={ReactDOMRe.Style.make(
                              ~marginLeft="5px",
@@ -104,8 +106,21 @@ let make = (~squadId, ~role) => {
       | _ => false
       };
 
+    let answerable =
+      switch (role) {
+      | Some(`Leader)
+      | Some(`Member) => true
+      | _ => false
+      };
+
+    let reportViewable =
+      switch (role) {
+      | Some(`Leader) => true
+      | _ => false
+      };
+
     <div>
-      <Headline> {str("YOUR BIRDVIEW SURVEYS")} </Headline>
+      <Headline> {str("BIRD VIEW SURVEYS")} </Headline>
       {switch (queryState) {
        | Loading => <Spinner />
        | Data(data) =>
@@ -116,6 +131,8 @@ let make = (~squadId, ~role) => {
               <SurveysList
                 data={data##allSurveys |> Array.to_list}
                 updatable
+                answerable
+                reportViewable
               />
             }}
          </div>

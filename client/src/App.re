@@ -45,6 +45,17 @@ let make = () =>
                          role={session.role}
                        />
                      }
+                   | Squad(squadId) =>
+                     switch (session.role) {
+                     | Some(`Leader)
+                     | Some(`Admin) =>
+                       <SurveysList
+                         squadId={squadId->Some}
+                         role={session.role}
+                       />
+
+                     | _ => <FriendlyError message="Unauthorized" />
+                     }
 
                    | SurveyDetail(id) => <SurveyDetail id session />
                    | SurveyReport(id) =>

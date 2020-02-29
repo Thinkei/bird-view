@@ -1,3 +1,5 @@
+open Ehd;
+
 let str = React.string;
 
 module QueryConfig = [%graphql
@@ -37,15 +39,14 @@ module DisplayInTable = {
   [@react.component]
   let make = (~data) => {
     <div>
-      <CreateNewSurveysButton
-        squadIds={data |> List.map(r => r##id)}
-      />
+      <CreateNewSurveysButton squadIds={data |> List.map(r => r##id)} />
       <Table>
         <thead>
           <TableRow>
             <TableHeader> {"Squad Name" |> str} </TableHeader>
             <TableHeader> {"Squad Lead" |> str} </TableHeader>
             <TableHeader> {"Last Sent" |> str} </TableHeader>
+            <TableHeader> {"Actions" |> str} </TableHeader>
           </TableRow>
         </thead>
         <tbody>
@@ -74,6 +75,11 @@ module DisplayInTable = {
                        }
                      )
                      |> str}
+                  </TableData>
+                  <TableData>
+                    <Route.Link route=Route.Config.(Squad(rowData##id))>
+                      <Button _type=`primary> {"Detail" |> str} </Button>
+                    </Route.Link>
                   </TableData>
                 </TableRow>
               })
