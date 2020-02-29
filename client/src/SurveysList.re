@@ -89,7 +89,6 @@ module Query = ReasonApolloHooks.Query.Make(QueryConfig);
 
 [@react.component]
 let make = (~squadId, ~role) => {
-  Js.log(role);
   switch (squadId) {
   | None =>
     <FriendlyError
