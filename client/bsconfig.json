@@ -23,7 +23,8 @@
     "re-tailwind",
     "bs-log",
     "bs-css",
-    "bs-eh-design"
+    "bs-eh-design",
+    "bs-chakra"
   ],
   "ppx-flags": ["@baransu/graphql_ppx_re/ppx6", "bs-log/ppx"],
   "warnings": {

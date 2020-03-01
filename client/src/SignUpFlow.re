@@ -57,15 +57,6 @@ let make = (~setSession) => {
       {email: "", password: "", userId: "", currentStep: ProvidingEmailPwd},
     );
   <div>
-    <Steps
-      progressDot=true
-      size=`small
-      current={state.currentStep |> currentStepToJs}
-      status=`wait
-      style={ReactDOMRe.Style.make(~marginLeft="10px", ())}>
-      <Step title="Sign up with EH company email" />
-      <Step title="Select your squad" />
-    </Steps>
     {switch (state.currentStep) {
      | ProvidingEmailPwd =>
        <SignUp

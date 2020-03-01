@@ -1,15 +1,8 @@
-open Ehd;
 open ReasonApolloTypes;
 exception GraphQLErrors(array(graphqlError));
 exception EmptyResponse;
 
 let str = ReasonReact.string;
-
-let layoutWrapper =
-  ReactDOMRe.Style.make(~display="flex", ~justifyContent="center", ());
-let sider = ReactDOMRe.Style.make(~lineHeight="120px", ());
-let content =
-  ReactDOMRe.Style.make(~minHeight="120px", ~lineHeight="120px", ());
 
 module SignInConfig = [%graphql
   {|
@@ -39,12 +32,15 @@ type action =
 
 [@react.component]
 let make = (~setSession) => {
+  let toast = Chakra.Toast.useToast();
+  let (touched, setTouched) = React.useState(() => false);
   React.useEffect0(() => {
-    Notification.warning(
-      Notification.makeConfigProps(
-        ~message="You need to sign in to continue!",
-        (),
-      ),
+    toast(
+      ~title="Hi there",
+      ~description="You need to sign in to continue!",
+      ~position=`topRight,
+      ~status=`warning,
+      (),
     );
     None;
   });
@@ -60,124 +56,128 @@ let make = (~setSession) => {
 
   <SignInMutation>
     ...{(mutate, {result}) => {
-      <div style=layoutWrapper>
-        <Card
-          title="Sign In" style={ReactDOMRe.Style.make(~width="300px", ())}>
-          <form>
-            <Input
-              _type="email"
-              style={ReactDOMRe.Style.make(~height="28px", ())}
-              placeholder="Email"
-              onChange={e =>
-                e->ReactEvent.Form.target##value->UpdateEmail->dispatch
-              }
-            />
-            <br />
-            <br />
-            <Input
-              _type="password"
-              style={ReactDOMRe.Style.make(~height="28px", ())}
-              placeholder="Password"
-              onChange={e =>
-                e->ReactEvent.Form.target##value->UpdatePassword->dispatch
-              }
-            />
-            {switch (result) {
-             | Error(e) => <ErrorAlert message=e##message />
-             | _ => React.null
-             }}
-            <br />
-            <br />
-            <Button
-              onClick={e => {
-                ReactEvent.Synthetic.preventDefault(e);
+      <Group title="Sign In">
+        <Chakra.Text fontSize="md">
+          "Sign in with Employment Hero email"->React.string
+        </Chakra.Text>
+        <br />
+        <form>
+          <Chakra.Input
+            _type=`email
+            placeholder="Email"
+            onChange={e =>
+              e->ReactEvent.Form.target##value->UpdateEmail->dispatch
+            }
+            isRequired=true
+            isInvalid={touched && !FormValidation.validEHEmail(state.email)}
+          />
+          <br />
+          <br />
+          <Chakra.Input
+            _type=`password
+            placeholder="Password"
+            isRequired=true
+            onChange={e =>
+              e->ReactEvent.Form.target##value->UpdatePassword->dispatch
+            }
+            isInvalid={
+              touched && !FormValidation.nonEmptyString(state.password)
+            }
+          />
+          {switch (result) {
+           | Error(e) => <ErrorAlert message=e##message />
+           | _ => React.null
+           }}
+          <br />
+          <br />
+          <Chakra.Button
+            onClick={e => {
+              setTouched(_ => true);
+              ReactEvent.Synthetic.preventDefault(e);
 
-                switch (
-                  FormValidation.validEmail(state.email),
-                  FormValidation.nonEmptyString(state.password),
-                ) {
-                | (false, _) =>
-                  Notification.error(
-                    Notification.makeConfigProps(
-                      ~message="Invalid email",
-                      (),
-                    ),
-                  )
-                  |> ignore
-                | (_, false) =>
-                  Notification.error(
-                    Notification.makeConfigProps(
-                      ~message="Require non-empty password",
-                      (),
-                    ),
-                  )
-                  |> ignore
-                | _ =>
-                  let signinVariables =
-                    SignInConfig.make(
-                      ~email=state.email,
-                      ~password=state.password,
-                      (),
-                    )##variables;
+              switch (
+                FormValidation.validEHEmail(state.email),
+                FormValidation.nonEmptyString(state.password),
+              ) {
+              | (false, _) =>
+                toast(
+                  ~title="Oops",
+                  ~description="Invalid email",
+                  ~position=`topRight,
+                  ~status=`warning,
+                  (),
+                )
+              | (_, false) =>
+                toast(
+                  ~title="Oops",
+                  ~description="Require non-empty password",
+                  ~position=`topRight,
+                  ~status=`warning,
+                  (),
+                )
+              | _ =>
+                let signinVariables =
+                  SignInConfig.make(
+                    ~email=state.email,
+                    ~password=state.password,
+                    (),
+                  )##variables;
 
-                  mutate(~variables=signinVariables, ())
-                  |> Js.Promise.then_(res => {
-                       switch (res) {
-                       | Errors(_)
-                       | EmptyResponse =>
-                         Notification.error(
-                           Notification.makeConfigProps(
-                             ~message="Something went wrong!",
-                             (),
-                           ),
+                mutate(~variables=signinVariables, ())
+                |> Js.Promise.then_(res => {
+                     switch (res) {
+                     | Errors(_)
+                     | EmptyResponse =>
+                       toast(
+                         ~title="Oops",
+                         ~description="Something went wrong!",
+                         ~position=`topRight,
+                         ~status=`danger,
+                         (),
+                       )
+                     | Data(data) =>
+                       open Session;
+                       switch (
+                         data##signinUser##token,
+                         data##signinUser##user,
+                       ) {
+                       | (Some(tk), Some(user)) =>
+                         setSession({
+                           token: tk,
+                           role: user##role,
+                           userId: user##id,
+                           squadId:
+                             Belt.Option.map(user##squad, squad => squad##id),
+                         })
+                       | (_, _) =>
+                         toast(
+                           ~title="Oops",
+                           ~description="Something went wrong!",
+                           ~position=`topRight,
+                           ~status=`danger,
+                           (),
                          )
-                         |> ignore
-                       | Data(data) =>
-                         open Session;
-                         switch (
-                           data##signinUser##token,
-                           data##signinUser##user,
-                         ) {
-                         | (Some(tk), Some(user)) =>
-                           setSession({
-                             token: tk,
-                             role: user##role,
-                             userId: user##id,
-                             squadId:
-                               Belt.Option.map(user##squad, squad =>
-                                 squad##id
-                               ),
-                           })
-                         | (_, _) =>
-                           Notification.error(
-                             Notification.makeConfigProps(
-                               ~message="Something went wrong!",
-                               (),
-                             ),
-                           )
-                           |> ignore
-                         };
-                         Notification.success(
-                           Notification.makeConfigProps(
-                             ~message="Sign in successfully",
-                             (),
-                           ),
-                         )
-                         |> ignore;
                        };
-                       Js.Promise.resolve();
-                     })
-                  |> ignore;
-                };
-              }}
-              loading={Button.LoadingProp.Bool(result == Loading)}
-              htmlType="submit"
-              _type=`primary>
-              {str("Sign in")}
-            </Button>
-          </form>
-        </Card>
-      </div>
+
+                       toast(
+                         ~title="Welcome back!",
+                         ~description="You've signed in successfully",
+                         ~position=`topRight,
+                         ~status=`success,
+                         (),
+                       );
+                     };
+                     Js.Promise.resolve();
+                   })
+                |> ignore;
+              };
+            }}
+            variantColor=`blue
+            isLoading={result == Loading}>
+            {str("Sign in")}
+          </Chakra.Button>
+        </form>
+      </Group>
     }}
   </SignInMutation>;
 };

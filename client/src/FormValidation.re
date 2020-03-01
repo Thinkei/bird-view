@@ -1,8 +1,8 @@
 
 let nonEmptyString = value => value != "";
 
-let validEmail = str =>
-  Js.Re.fromString("^[^@\\s]+@([^@\\s]+\\.)+[^@\\W]+$")
+let validEHEmail = str =>
+  Js.Re.fromString("^[^@\\s\\:]+@employmenthero\\.com$")
   |> Js.Re.exec(str)
   |> (
     fun
