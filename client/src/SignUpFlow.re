@@ -4,8 +4,6 @@ exception EmptyResponse;
 
 let str = ReasonReact.string;
 
-module Step = Steps.Step;
-
 module SignInConfig = [%graphql
   {|
   mutation signinUser($email: String!, $password: String!) {
