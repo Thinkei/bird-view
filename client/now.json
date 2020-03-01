@@ -10,7 +10,7 @@
   ],
   "build": {
     "env": {
-      "EH_NPM_TOKEN": "@eh-npm-token"
+      "GRAPHQL_SERVER_URI": "@birdview-graphql-server-uri"
     }
   }
 }

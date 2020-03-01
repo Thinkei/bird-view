@@ -3,7 +3,7 @@
   "name": "bird-view",
   "public": false,
   "env": {
-    "EH_NPM_TOKEN": "@eh-npm-token"
+    "GRAPHQL_SERVER_URI": "@birdview-graphql-server-uri"
   },
   "builds": [
     { "src": "client/package.json", "use": "@now/static-build" }
@@ -13,7 +13,7 @@
   ],
   "build": {
     "env": {
-      "EH_NPM_TOKEN": "@eh-npm-token"
+      "GRAPHQL_SERVER_URI": "@birdview-graphql-server-uri"
     }
   }
 }
