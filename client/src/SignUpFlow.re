@@ -1,4 +1,3 @@
-open Ehd;
 open ReasonApolloTypes;
 exception GraphQLErrors(array(graphqlError));
 exception EmptyResponse;
@@ -43,6 +42,8 @@ type action =
 
 [@react.component]
 let make = (~setSession) => {
+  let toast = Chakra.Toast.useToast();
+
   let (state, dispatch) =
     React.useReducer(
       state =>
@@ -82,13 +83,13 @@ let make = (~setSession) => {
                     switch (res) {
                     | Errors(_)
                     | EmptyResponse =>
-                      Notification.error(
-                        Notification.makeConfigProps(
-                          ~message="Something went wrong!",
-                          (),
-                        ),
+                      toast(
+                        ~title="Oops",
+                        ~description="Something went wrong!",
+                        ~position=`topRight,
+                        ~status=`danger,
+                        (),
                       )
-                      |> ignore
                     | Data(data) =>
                       open Session;
                       switch (data##signinUser##token, data##signinUser##user) {
@@ -101,21 +102,21 @@ let make = (~setSession) => {
                             Belt.Option.map(user##squad, squad => squad##id),
                         })
                       | (_, _) =>
-                        Notification.error(
-                          Notification.makeConfigProps(
-                            ~message="Something went wrong!",
-                            (),
-                          ),
-                        )
-                        |> ignore
-                      };
-                      Notification.success(
-                        Notification.makeConfigProps(
-                          ~message="Sign in successfully",
+                        toast(
+                          ~title="Oops",
+                          ~description="Something went wrong!",
+                          ~position=`topRight,
+                          ~status=`danger,
                           (),
-                        ),
-                      )
-                      |> ignore;
+                        )
+                      };
+                      toast(
+                        ~title="Nice",
+                        ~description="You've signed up successfully",
+                        ~position=`topRight,
+                        ~status=`success,
+                        (),
+                      );
                     };
                     Js.Promise.resolve();
                   })

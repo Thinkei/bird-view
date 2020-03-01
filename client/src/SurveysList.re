@@ -1,4 +1,4 @@
-open Ehd;
+open Chakra;
 let str = ReasonReact.string;
 
 let optionStr =
@@ -41,24 +41,31 @@ module SurveysList = {
                        </TableData>
                      : ReasonReact.null}
                   <TableData>
-                    {answerable
-                       ? <Route.Link
-                           route=Route.Config.(SurveyDetail(rowData##id))>
-                           <Button _type=`primary disabled={!rowData##enabled}>
-                             {"Answer" |> str}
-                           </Button>
-                         </Route.Link>
-                       : React.null}
-                    {reportViewable
-                       ? <Route.Link
-                           style={ReactDOMRe.Style.make(
-                             ~marginLeft="5px",
-                             (),
-                           )}
-                           route=Route.Config.(SurveyReport(rowData##id))>
-                           <Button> {"View report" |> str} </Button>
-                         </Route.Link>
-                       : ReasonReact.null}
+                    <ButtonGroup spacing=4>
+                      {answerable
+                         ? <Route.Link
+                             route=Route.Config.(SurveyDetail(rowData##id))>
+                             <Button
+                               variantColor=`blue
+                               size=`sm
+                               isDisabled={!rowData##enabled}>
+                               {"Answer" |> str}
+                             </Button>
+                           </Route.Link>
+                         : React.null}
+                      {reportViewable
+                         ? <Route.Link
+                             style={ReactDOMRe.Style.make(
+                               ~marginLeft="5px",
+                               (),
+                             )}
+                             route=Route.Config.(SurveyReport(rowData##id))>
+                             <Button variantColor=`cyan size=`sm>
+                               {"View report" |> str}
+                             </Button>
+                           </Route.Link>
+                         : ReasonReact.null}
+                    </ButtonGroup>
                   </TableData>
                 </TableRow>
               })
@@ -121,11 +128,11 @@ let make = (~squadId, ~role) => {
     <div>
       <Headline> {str("BIRD VIEW SURVEYS")} </Headline>
       {switch (queryState) {
-       | Loading => <Spinner />
+       | Loading => <AppSpinner />
        | Data(data) =>
          <div>
            {switch (data##allSurveys |> Belt.Array.size) {
-            | 0 => <Ehd.Empty />
+            | 0 => <Empty />
             | _ =>
               <SurveysList
                 data={data##allSurveys |> Array.to_list}

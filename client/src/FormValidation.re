@@ -1,4 +1,3 @@
-
 let nonEmptyString = value => value != "";
 
 let validEHEmail = str =>

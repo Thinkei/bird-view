@@ -1,9 +1,6 @@
 [%bs.raw {|require("tailwindcss/dist/tailwind.min.css")|}];
-[%bs.raw {|require("@ehrocks/eh-ant-design/styles/eh-ant-design.css")|}];
-[%bs.raw {|require("antd/dist/antd.css")|}];
-
-open Ehd;
 open Session;
+open Chakra;
 
 module AppRouter = Router.Create(Route.Config);
 
@@ -20,13 +17,14 @@ let make = () =>
                 <div
                   style={ReactDOMRe.Style.make(
                     ~position="absolute",
-                    ~top="10px",
+                    ~top="5px",
                     ~right="10px",
                     (),
                   )}>
                   <Button
-                    ghost=true
-                    _type=`danger
+                    size=`sm
+                    variant=`outline
+                    variantColor=`red
                     onClick={_ => {
                       Session.clearSession();
                       Utils.refreshPage();

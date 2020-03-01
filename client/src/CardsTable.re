@@ -79,7 +79,7 @@ let make = (~data, ~surveyId, ~userId) => {
   let (queryState, _full) = Query.use(~variables, ());
 
   switch (queryState) {
-  | Loading => <Spinner />
+  | Loading => <AppSpinner />
   | Data(res) =>
     <RenderByTable
       surveyId

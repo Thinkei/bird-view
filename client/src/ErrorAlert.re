@@ -1,10 +1,8 @@
-open Ehd;
-
 [@react.component]
 let make = (~message) =>
-  <Alert
-    style={ReactDOMRe.Style.make(~width="100%", ~marginTop="20px", ())}
-    message={message |> React.string}
-    _type=`error
-    closable=true
-  />;
+  <div style={ReactDOMRe.Style.make(~width="100%", ~marginTop="20px", ())}>
+    <Chakra.Alert status=`error>
+      <Chakra.AlertIcon />
+      message->React.string
+    </Chakra.Alert>
+  </div>;

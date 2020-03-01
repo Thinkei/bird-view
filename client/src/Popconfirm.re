@@ -8,7 +8,7 @@ external make:
     ~okType: [@bs.string] [ | `primary | `ghost | `dashed | `danger]=?,
     ~cancelText: React.element=?,
     ~onVisibleChange: bool => unit=?,
-    ~children: React.element,
+    ~children: React.element
   ) =>
   React.element =
   "default";

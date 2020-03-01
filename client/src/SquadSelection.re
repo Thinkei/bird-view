@@ -90,6 +90,7 @@ module Selection = {
               </option>
             </Chakra.Select>
           </div>
+          <br />
           <Chakra.Button
             isLoading={result == Loading}
             isDisabled={Belt.Option.isNone(selectedSquad)}
@@ -137,10 +138,10 @@ let make = (~onSquadSelectSuccess, ~userId) => {
   let (queryState, _full) = Query.use();
 
   switch (queryState) {
-  | Loading => <Spinner />
+  | Loading => <AppSpinner />
   | Data(res) =>
     <Selection squads=res##allSquads userId onSquadSelectSuccess />
-  | NoData => <Ehd.Empty />
+  | NoData => <Empty />
   | Error(e) => <FriendlyError message=e##message />
   };
 };

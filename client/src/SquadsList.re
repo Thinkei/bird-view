@@ -1,5 +1,3 @@
-open Ehd;
-
 let str = React.string;
 
 module QueryConfig = [%graphql
@@ -39,7 +37,16 @@ module DisplayInTable = {
   [@react.component]
   let make = (~data) => {
     <div>
-      <CreateNewSurveysButton squadIds={data |> List.map(r => r##id)} />
+      <Headline> {str("ALL SQUADS")} </Headline>
+      <div
+        style={ReactDOMRe.Style.make(
+          ~position="absolute",
+          ~top="5px",
+          ~left="10px",
+          (),
+        )}>
+        <CreateNewSurveysButton squadIds={data |> List.map(r => r##id)} />
+      </div>
       <Table>
         <thead>
           <TableRow>
@@ -78,7 +85,9 @@ module DisplayInTable = {
                   </TableData>
                   <TableData>
                     <Route.Link route=Route.Config.(Squad(rowData##id))>
-                      <Button _type=`primary> {"Detail" |> str} </Button>
+                      <Chakra.Button size=`sm variantColor=`blue>
+                        {"Detail" |> str}
+                      </Chakra.Button>
                     </Route.Link>
                   </TableData>
                 </TableRow>
@@ -96,11 +105,11 @@ let make = () => {
   let (queryState, _full) = Query.use();
 
   switch (queryState) {
-  | Loading => <Spinner />
+  | Loading => <AppSpinner />
   | Data(data) =>
     <div>
       {switch (data##allSquads |> Belt.Array.size) {
-       | 0 => <Ehd.Empty />
+       | 0 => <Empty />
        | _ => <DisplayInTable data={data##allSquads |> Array.to_list} />
        }}
     </div>

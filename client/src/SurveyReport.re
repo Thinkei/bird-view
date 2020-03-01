@@ -85,12 +85,15 @@ module ReportTable = {
       <Route.Link
         style={ReactDOMRe.Style.make(
           ~position="absolute",
-          ~top="10px",
+          ~top="5px",
           ~left="10px",
           (),
         )}
         route=Route.Config.(Home)>
-        <Ehd.Button> {"View all surveys" |> React.string} </Ehd.Button>
+        <Chakra.Button
+          variant=`ghost variantColor=`blue size=`sm leftIcon=`arrowLeft>
+          {"All surveys" |> React.string}
+        </Chakra.Button>
       </Route.Link>
       <Headline> {str("SURVEY REPORT")} </Headline>
       <Table>
@@ -109,21 +112,19 @@ module ReportTable = {
            |> Array.map(card => {
                 <TableRow>
                   <TableData>
-                    <Ehd.Tooltip
-                      title={
-                        <div>
-                          <p>
-                            <strong> {"Example of Awesome: " |> str} </strong>
-                            <span> {card.goodExample |> str} </span>
-                          </p>
-                          <p>
-                            <strong> {"Example of Crappy: " |> str} </strong>
-                            <span> {card.badExample |> str} </span>
-                          </p>
-                        </div>
+                    <Chakra.Tooltip
+                      label={
+                        [
+                          "Example of Awesome: ",
+                          card.goodExample,
+                          "\n",
+                          "Example of Crappy: ",
+                          card.badExample,
+                        ]
+                        |> List.fold_left((++), "")
                       }>
-                      <strong> {str(card.description)} </strong>
-                    </Ehd.Tooltip>
+                      card.description->React.string
+                    </Chakra.Tooltip>
                   </TableData>
                   {users
                    |> Array.map((user: user) => {
@@ -178,7 +179,7 @@ let make = (~id, ~session) => {
       let (queryState, _full) = Query.use(~variables, ());
 
       switch (queryState) {
-      | Loading => <Spinner />
+      | Loading => <AppSpinner />
       | Data(data) =>
         <ReportTable users=data##allUsers cards=data##allCards />
       | NoData => <EmptyData />

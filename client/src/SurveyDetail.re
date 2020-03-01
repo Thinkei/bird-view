@@ -24,7 +24,7 @@ let make = (~id, ~session) => {
   let (queryState, _full) = Query.use(~variables, ());
 
   switch (queryState) {
-  | Loading => <Spinner />
+  | Loading => <AppSpinner />
   | Data(data) =>
     switch (data##survey) {
     | None => <FriendlyError message="Survey is not found" />
@@ -33,18 +33,21 @@ let make = (~id, ~session) => {
       | false => <FriendlyError message="Survey is diabled" />
       | true =>
         switch (data##allCards |> Belt.Array.size) {
-        | 0 => <Ehd.Empty />
+        | 0 => <Empty />
         | _ =>
           <div>
             <Route.Link
               style={ReactDOMRe.Style.make(
                 ~position="absolute",
-                ~top="10px",
+                ~top="5px",
                 ~left="10px",
                 (),
               )}
               route=Route.Config.(Home)>
-              <Ehd.Button> {"View all surveys" |> React.string} </Ehd.Button>
+              <Chakra.Button
+                variant=`ghost variantColor=`blue size=`sm leftIcon=`arrowLeft>
+                {"All surveys" |> React.string}
+              </Chakra.Button>
             </Route.Link>
             <CardsTable
               surveyId=id

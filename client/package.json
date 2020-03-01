@@ -24,7 +24,6 @@
     "@baransu/graphql_ppx_re": "^0.4.0",
     "bs-chakra": "https://github.com/Thinkei/bs-chakra",
     "bs-css": "^11.0.0",
-    "bs-eh-design": "0.0.7",
     "re-tailwind": "0.0.3",
     "reason-apollo": "git://github.com/apollographql/reason-apollo.git#master",
     "reason-apollo-hooks": "^2.7.0"
