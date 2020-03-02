@@ -16,7 +16,7 @@ let make = (~session) => {
     switch (session.squadId) {
     | None =>
       <FriendlyError
-        message="You don't belong to any squad. Contact Hieu Pham to assign you into a squad!"
+        message="You don't belong to any squad. Try to re-signin or contact Hieu Pham to support"
       />
     | Some(squadId) =>
       let variables = QueryConfig.makeVariables(~squadId, ());
