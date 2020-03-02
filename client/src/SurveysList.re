@@ -1,4 +1,4 @@
-open Ehd;
+open Chakra;
 let str = ReasonReact.string;
 
 let optionStr =
@@ -8,16 +8,16 @@ let optionStr =
 
 module SurveysList = {
   [@react.component]
-  let make = (~data, ~isLeader) => {
+  let make = (~data, ~updatable, ~answerable, ~reportViewable) => {
     <div>
       <Table>
         <thead>
           <TableRow>
-            <TableHeader> {"Created At" |> str} </TableHeader>
+            <TableHeader> {"Sent At" |> str} </TableHeader>
             <TableHeader> {"Squad Name" |> str} </TableHeader>
-            {isLeader
+            {updatable
                ? <TableHeader> {"Enabled?" |> str} </TableHeader> : React.null}
-            <TableHeader> {"Action" |> str} </TableHeader>
+            <TableHeader> {"Actions" |> str} </TableHeader>
           </TableRow>
         </thead>
         <tbody>
@@ -32,7 +32,7 @@ module SurveysList = {
                      |> str}
                   </TableData>
                   <TableData> {rowData##squad##name |> str} </TableData>
-                  {isLeader
+                  {updatable
                      ? <TableData>
                          <SurveyStatusSwitch
                            surveyId=rowData##id
@@ -41,22 +41,31 @@ module SurveysList = {
                        </TableData>
                      : ReasonReact.null}
                   <TableData>
-                    <Route.Link
-                      route=Route.Config.(SurveyDetail(rowData##id))>
-                      <Button _type=`primary disabled={!rowData##enabled}>
-                        {"Answer" |> str}
-                      </Button>
-                    </Route.Link>
-                    {isLeader
-                       ? <Route.Link
-                           style={ReactDOMRe.Style.make(
-                             ~marginLeft="5px",
-                             (),
-                           )}
-                           route=Route.Config.(SurveyReport(rowData##id))>
-                           <Button> {"View report" |> str} </Button>
-                         </Route.Link>
-                       : ReasonReact.null}
+                    <ButtonGroup spacing=4>
+                      {answerable
+                         ? <Route.Link
+                             route=Route.Config.(SurveyDetail(rowData##id))>
+                             <Button
+                               variantColor=`blue
+                               size=`sm
+                               isDisabled={!rowData##enabled}>
+                               {"Answer" |> str}
+                             </Button>
+                           </Route.Link>
+                         : React.null}
+                      {reportViewable
+                         ? <Route.Link
+                             style={ReactDOMRe.Style.make(
+                               ~marginLeft="5px",
+                               (),
+                             )}
+                             route=Route.Config.(SurveyReport(rowData##id))>
+                             <Button variantColor=`cyan size=`sm>
+                               {"View report" |> str}
+                             </Button>
+                           </Route.Link>
+                         : ReasonReact.null}
+                    </ButtonGroup>
                   </TableData>
                 </TableRow>
               })
@@ -86,46 +95,56 @@ module QueryConfig = [%graphql
 module Query = ReasonApolloHooks.Query.Make(QueryConfig);
 
 [@react.component]
-let make = (~session) => {
-  Session.(
-    switch (session.squadId) {
-    | None =>
-      <FriendlyError
-        message="You doesn't belong to any squad. Contact Hieu Pham to assign you into a squad!"
-      />
-    | Some(squadId) =>
-      let variables = QueryConfig.make(~squadId, ())##variables;
-      let (queryState, _full) = Query.use(~variables, ());
+let make = (~squadId, ~role) => {
+  switch (squadId) {
+  | None =>
+    <FriendlyError
+      message="You doesn't belong to any squad. Contact Hieu Pham to assign you into a squad!"
+    />
+  | Some(squadId) =>
+    let variables = QueryConfig.make(~squadId, ())##variables;
+    let (queryState, _full) = Query.use(~variables, ());
 
-      <div>
-        <Headline> {str("YOUR BIRDVIEW SURVEYS")} </Headline>
-        {switch (queryState) {
-         | Loading => <Spinner />
-         | Data(data) =>
-           <div>
-             {switch (session.squadId, session.role) {
-              | (Some(squadId), Some(`Leader)) =>
-                <CreateNewSurveyButton squadId />
-              | (_, _) => ReasonReact.null
-              }}
-             {switch (data##allSurveys |> Belt.Array.size) {
-              | 0 => <Ehd.Empty />
-              | _ =>
-                <SurveysList
-                  data={data##allSurveys |> Array.to_list}
-                  isLeader={
-                    switch (session.role) {
-                    | Some(`Leader) => true
-                    | _ => false
-                    }
-                  }
-                />
-              }}
-           </div>
-         | NoData => <EmptyData />
-         | Error(e) => <FriendlyError message=e##message />
-         }}
-      </div>;
-    }
-  );
+    let updatable =
+      switch (role) {
+      | Some(`Leader)
+      | Some(`Admin) => true
+      | _ => false
+      };
+
+    let answerable =
+      switch (role) {
+      | Some(`Leader)
+      | Some(`Member) => true
+      | _ => false
+      };
+
+    let reportViewable =
+      switch (role) {
+      | Some(`Leader) => true
+      | _ => false
+      };
+
+    <div>
+      <Headline> {str("BIRD VIEW SURVEYS")} </Headline>
+      {switch (queryState) {
+       | Loading => <AppSpinner />
+       | Data(data) =>
+         <div>
+           {switch (data##allSurveys |> Belt.Array.size) {
+            | 0 => <Empty />
+            | _ =>
+              <SurveysList
+                data={data##allSurveys |> Array.to_list}
+                updatable
+                answerable
+                reportViewable
+              />
+            }}
+         </div>
+       | NoData => <EmptyData />
+       | Error(e) => <FriendlyError message=e##message />
+       }}
+    </div>;
+  };
 };

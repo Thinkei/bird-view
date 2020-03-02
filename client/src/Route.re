@@ -8,6 +8,7 @@ module type Config = {
 module Config = {
   type route =
     | Home
+    | Squad(string)
     | SurveyDetail(string)
     | SurveyReport(string)
     | NotFound;
@@ -20,6 +21,7 @@ module Config = {
     | ["/"] =>
       switch (hashes) {
       | [""] => Home
+      | ["", "squads", squadId] => Squad(squadId)
       | ["", "surveys", surveyId] => SurveyDetail(surveyId)
       | ["", "reports", surveyId] => SurveyReport(surveyId)
       | _ => NotFound
@@ -31,6 +33,7 @@ module Config = {
   let toUrl =
     fun
     | Home => "#"
+    | Squad(id) => "#/squads/" ++ id
     | SurveyDetail(id) => "#/surveys/" ++ id
     | SurveyReport(id) => "#/reports/" ++ id
     | NotFound => "#/404";

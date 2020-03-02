@@ -41,13 +41,7 @@ let make = (~surveyId, ~cardId, ~userId) => {
           | None => ()
           | Some(answer) =>
             let createVariables =
-              CreateConfig.make(
-                ~cardId,
-                ~surveyId,
-                ~userId,
-                ~answer,
-                (),
-              )##variables;
+              CreateConfig.make(~cardId, ~surveyId, ~userId, ~answer, ())##variables;
 
             mutate(
               ~variables=createVariables,

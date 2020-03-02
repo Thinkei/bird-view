@@ -1,9 +1,6 @@
-open Ehd;
 open ReasonApolloTypes;
 exception GraphQLErrors(array(graphqlError));
 exception EmptyResponse;
-
-module Option = Select.Option;
 
 let str = React.string;
 
@@ -49,95 +46,87 @@ module Selection = {
     open Session;
     let (selectedSquad, setSelectedSquad) = React.useState(() => None);
     let (role, setRole) = React.useState(() => `Member);
+    let toast = Chakra.Toast.useToast();
 
     <Mutation>
-      ...{(mutate, _) => {
+      ...{(mutate, {result}) => {
         <div>
-          <div
-            style={ReactDOMRe.Style.make(
-              ~display="flex",
-              ~padding="20px",
-              ~justifyContent="center",
-              (),
-            )}>
-            <div>
-              <p> {"Your squad:" |> React.string} </p>
-              <Select
-                style={ReactDOMRe.Style.make(
-                  ~width="200px",
-                  ~marginRight="10px",
-                  (),
-                )}
-                onChange={selected => setSelectedSquad(_ => Some(selected))}>
-                {squads
-                 |> Array.map(squad => {
-                      <Option key={squad.id}> {squad.name |> str} </Option>
-                    })
-                 |> React.array}
-              </Select>
-            </div>
-            <div>
-              <p> {"Your role:" |> React.string} </p>
-              <Select
-                style={ReactDOMRe.Style.make(
-                  ~width="120px",
-                  (),
-                )}
-                defaultValue={roleToJs(`Member)}
-                onChange={role => setRole(_ => roleFromJs(role) |? `Member)}>
-                <Option key={roleToJs(`Member)}>
-                  {roleToJs(`Member) |> str}
-                </Option>
-                <Option key={roleToJs(`Leader)}>
-                  {roleToJs(`Leader) |> str}
-                </Option>
-              </Select>
-            </div>
+          <div>
+            <Chakra.Text fontSize="sm">
+              {"Your squad:" |> React.string}
+            </Chakra.Text>
+            <Chakra.Select
+              onChange={e => {
+                let selectedSquad = e->ReactEvent.Form.target##value->Some;
+                setSelectedSquad(_ => selectedSquad);
+              }}>
+              <option value="" />
+              {squads
+               |> Array.map(squad => {
+                    <option key={squad.id} value={squad.id}>
+                      {squad.name |> str}
+                    </option>
+                  })
+               |> React.array}
+            </Chakra.Select>
           </div>
-          <div
-            style={ReactDOMRe.Style.make(
-              ~display="flex",
-              ~padding="10px",
-              ~justifyContent="center",
-              (),
-            )}>
-            <Button
-              disabled={Belt.Option.isNone(selectedSquad)}
-              onClick={e => {
-                ReactEvent.Synthetic.preventDefault(e);
-                Belt.Option.map(
-                  selectedSquad,
-                  squadId => {
-                    let variables =
-                      Config.make(~id=userId, ~squadId, ~role, ())##variables;
+          <br />
+          <div>
+            <Chakra.Text fontSize="sm">
+              {"Your role:" |> React.string}
+            </Chakra.Text>
+            <Chakra.Select
+              defaultValue={roleToJs(`Member)}
+              onChange={e => {
+                let selectedRole =
+                  e->ReactEvent.Form.target##value->roleFromJs |? `Member;
+                setRole(_ => selectedRole);
+              }}>
+              <option key={roleToJs(`Member)} value={roleToJs(`Member)}>
+                {roleToJs(`Member) |> str}
+              </option>
+              <option key={roleToJs(`Leader)} value={roleToJs(`Leader)}>
+                {roleToJs(`Leader) |> str}
+              </option>
+            </Chakra.Select>
+          </div>
+          <br />
+          <Chakra.Button
+            isLoading={result == Loading}
+            isDisabled={Belt.Option.isNone(selectedSquad)}
+            onClick={e => {
+              ReactEvent.Synthetic.preventDefault(e);
+              Belt.Option.map(
+                selectedSquad,
+                squadId => {
+                  let variables =
+                    Config.make(~id=userId, ~squadId, ~role, ())##variables;
 
-                    mutate(~variables, ())
-                    |> Js.Promise.then_(res => {
-                         switch (res) {
-                         | Errors(_)
-                         | EmptyResponse =>
-                           Notification.error(
-                             Notification.makeConfigProps(
-                               ~message="Something went wrong!",
-                               (),
-                             ),
-                           )
-                           |> ignore
-                         | Data(_) => onSquadSelectSuccess()
-                         };
-                         Js.Promise.resolve();
-                       })
-                    |> ignore;
-                  },
-                )
-                |> ignore;
-                ();
-              }}
-              htmlType="submit"
-              _type=`primary>
-              {str("Finish")}
-            </Button>
-          </div>
+                  mutate(~variables, ())
+                  |> Js.Promise.then_(res => {
+                       switch (res) {
+                       | Errors(_)
+                       | EmptyResponse =>
+                         toast(
+                           ~title="Oops",
+                           ~description="Something went wrong!",
+                           ~position=`topRight,
+                           ~status=`danger,
+                           (),
+                         )
+                       | Data(_) => onSquadSelectSuccess()
+                       };
+                       Js.Promise.resolve();
+                     })
+                  |> ignore;
+                },
+              )
+              |> ignore;
+              ();
+            }}
+            variantColor=`blue>
+            {str("Finish")}
+          </Chakra.Button>
         </div>
       }}
     </Mutation>;
@@ -149,7 +138,7 @@ let make = (~onSquadSelectSuccess, ~userId) => {
   let (queryState, _full) = Query.use();
 
   switch (queryState) {
-  | Loading => <Spinner />
+  | Loading => <AppSpinner />
   | Data(res) =>
     <Selection squads=res##allSquads userId onSquadSelectSuccess />
   | NoData => <Empty />

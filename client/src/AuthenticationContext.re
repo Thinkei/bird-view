@@ -1,4 +1,3 @@
-
 let context = React.createContext("");
 
 let getToken = () => React.useContext(context);

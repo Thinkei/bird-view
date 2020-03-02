@@ -6,8 +6,7 @@ module Styles = {
 
 [@react.component]
 let make = (~title, ~children) =>
-  <section className={Styles.wrapper}>
+  <section className=Styles.wrapper>
     <h3 className=Styles.h3> {ReasonReact.string(title)} </h3>
     children
   </section>;
-

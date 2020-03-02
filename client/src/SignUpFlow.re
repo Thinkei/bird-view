@@ -1,11 +1,8 @@
-open Ehd;
 open ReasonApolloTypes;
 exception GraphQLErrors(array(graphqlError));
 exception EmptyResponse;
 
 let str = ReasonReact.string;
-
-module Step = Steps.Step;
 
 module SignInConfig = [%graphql
   {|
@@ -43,6 +40,8 @@ type action =
 
 [@react.component]
 let make = (~setSession) => {
+  let toast = Chakra.Toast.useToast();
+
   let (state, dispatch) =
     React.useReducer(
       state =>
@@ -57,15 +56,6 @@ let make = (~setSession) => {
       {email: "", password: "", userId: "", currentStep: ProvidingEmailPwd},
     );
   <div>
-    <Steps
-      progressDot=true
-      size=`small
-      current={state.currentStep |> currentStepToJs}
-      status=`wait
-      style={ReactDOMRe.Style.make(~marginLeft="10px", ())}>
-      <Step title="Sign up with EH company email" />
-      <Step title="Select your squad" />
-    </Steps>
     {switch (state.currentStep) {
      | ProvidingEmailPwd =>
        <SignUp
@@ -91,13 +81,13 @@ let make = (~setSession) => {
                     switch (res) {
                     | Errors(_)
                     | EmptyResponse =>
-                      Notification.error(
-                        Notification.makeConfigProps(
-                          ~message="Something went wrong!",
-                          (),
-                        ),
+                      toast(
+                        ~title="Oops",
+                        ~description="Something went wrong!",
+                        ~position=`topRight,
+                        ~status=`danger,
+                        (),
                       )
-                      |> ignore
                     | Data(data) =>
                       open Session;
                       switch (data##signinUser##token, data##signinUser##user) {
@@ -110,21 +100,21 @@ let make = (~setSession) => {
                             Belt.Option.map(user##squad, squad => squad##id),
                         })
                       | (_, _) =>
-                        Notification.error(
-                          Notification.makeConfigProps(
-                            ~message="Something went wrong!",
-                            (),
-                          ),
-                        )
-                        |> ignore
-                      };
-                      Notification.success(
-                        Notification.makeConfigProps(
-                          ~message="Sign in successfully",
+                        toast(
+                          ~title="Oops",
+                          ~description="Something went wrong!",
+                          ~position=`topRight,
+                          ~status=`danger,
                           (),
-                        ),
-                      )
-                      |> ignore;
+                        )
+                      };
+                      toast(
+                        ~title="Nice",
+                        ~description="You've signed up successfully",
+                        ~position=`topRight,
+                        ~status=`success,
+                        (),
+                      );
                     };
                     Js.Promise.resolve();
                   })

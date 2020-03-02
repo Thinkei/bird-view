@@ -2,7 +2,7 @@ let inMemoryCache = ApolloInMemoryCache.createInMemoryCache();
 
 let httpLink =
   ApolloLinks.createHttpLink(
-    ~uri="https://api.graph.cool/simple/v1/ck3swt8le9sal0119fx4dpb74",
+    ~uri=[%bs.raw {| process.env.GRAPHQL_SERVER_URI |}],
     (),
   );
 

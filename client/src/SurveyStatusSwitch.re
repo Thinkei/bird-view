@@ -16,13 +16,15 @@ module Mutation = ReasonApollo.CreateMutation(Config);
 let make = (~surveyId, ~enabled) =>
   <Mutation>
     ...{(mutate, _) => {
-      <Ehd.Switch
-        checkedChildren={str("Yes")}
-        unCheckedChildren={str("No")}
-        defaultChecked=enabled
-        onChange={(value, _) => {
+      <Chakra.Switch
+        defaultIsChecked=enabled
+        onChange={e => {
           let variables =
-            Config.make(~id=surveyId, ~enabled=value, ())##variables;
+            Config.make(
+              ~id=surveyId,
+              ~enabled=e->ReactEvent.Form.target##checked,
+              (),
+            )##variables;
           mutate(~variables, ~refetchQueries=[|"allSurveys"|], ()) |> ignore;
         }}
       />

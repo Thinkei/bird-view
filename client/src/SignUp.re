@@ -1,15 +1,8 @@
-open Ehd;
 open ReasonApolloTypes;
 exception GraphQLErrors(array(graphqlError));
 exception EmptyResponse;
 
 let str = ReasonReact.string;
-
-let layoutWrapper =
-  ReactDOMRe.Style.make(~display="flex", ~justifyContent="center", ());
-let sider = ReactDOMRe.Style.make(~lineHeight="120px", ());
-let content =
-  ReactDOMRe.Style.make(~minHeight="120px", ~lineHeight="120px", ());
 
 module SignUpConfig = [%graphql
   {|
@@ -43,111 +36,112 @@ let make = (~onSignUpSuccess) => {
       {email: "", password: ""},
     );
 
+  let toast = Chakra.Toast.useToast();
+
   <SignUpMutation>
     ...{(mutate, {result}) => {
-      <div style=layoutWrapper>
-        <Card
-          title="Sign Up" style={ReactDOMRe.Style.make(~width="300px", ())}>
-          <form>
-            <Input
-              _type="email"
-              style={ReactDOMRe.Style.make(~height="28px", ())}
-              placeholder="Email"
-              onChange={e =>
-                e->ReactEvent.Form.target##value->UpdateEmail->dispatch
-              }
-            />
-            <br />
-            <br />
-            <Input
-              _type="password"
-              style={ReactDOMRe.Style.make(~height="28px", ())}
-              placeholder="Password"
-              onChange={e =>
-                e->ReactEvent.Form.target##value->UpdatePassword->dispatch
-              }
-            />
-            {switch (result) {
-             | Error(e) => <ErrorAlert message=e##message />
-             | _ => React.null
-             }}
-            <br />
-            <br />
-            <Button
-              onClick={e => {
-                ReactEvent.Synthetic.preventDefault(e);
+      <Group title="Sign Up">
+        <Chakra.Text fontSize="md">
+          "Register with Employment Hero email"->React.string
+        </Chakra.Text>
+        <br />
+        <form>
+          <Chakra.Input
+            _type=`email
+            placeholder="Email"
+            onChange={e =>
+              e->ReactEvent.Form.target##value->UpdateEmail->dispatch
+            }
+          />
+          <br />
+          <br />
+          <Chakra.Input
+            _type=`password
+            placeholder="Password"
+            onChange={e =>
+              e->ReactEvent.Form.target##value->UpdatePassword->dispatch
+            }
+          />
+          {switch (result) {
+           | Error(e) => <ErrorAlert message=e##message />
+           | _ => React.null
+           }}
+          <br />
+          <br />
+          <Chakra.Button
+            onClick={e => {
+              ReactEvent.Synthetic.preventDefault(e);
 
-                switch (
-                  FormValidation.validEmail(state.email),
-                  FormValidation.nonEmptyString(state.password),
-                ) {
-                | (false, _) =>
-                  Notification.error(
-                    Notification.makeConfigProps(
-                      ~message="Invalid email",
-                      (),
-                    ),
-                  )
-                  |> ignore
-                | (_, false) =>
-                  Notification.error(
-                    Notification.makeConfigProps(
-                      ~message="Require non-empty password",
-                      (),
-                    ),
-                  )
-                  |> ignore
-                | _ =>
-                  let signinVariables =
-                    SignUpConfig.make(
-                      ~email=state.email,
-                      ~password=state.password,
-                      (),
-                    )##variables;
+              switch (
+                FormValidation.validEHEmail(state.email),
+                FormValidation.nonEmptyString(state.password),
+              ) {
+              | (false, _) =>
+                toast(
+                  ~title="Oops",
+                  ~description="Invalid email",
+                  ~position=`topRight,
+                  ~status=`warning,
+                  (),
+                )
+              | (_, false) =>
+                toast(
+                  ~title="Oops",
+                  ~description="Require non-empty password",
+                  ~position=`topRight,
+                  ~status=`warning,
+                  (),
+                )
+                |> ignore
+              | _ =>
+                let signinVariables =
+                  SignUpConfig.make(
+                    ~email=state.email,
+                    ~password=state.password,
+                    (),
+                  )##variables;
 
-                  mutate(~variables=signinVariables, ())
-                  |> Js.Promise.then_(res => {
-                       switch (res) {
-                       | Errors(_)
-                       | EmptyResponse =>
-                         Notification.error(
-                           Notification.makeConfigProps(
-                             ~message="Something went wrong!",
-                             (),
-                           ),
+                mutate(~variables=signinVariables, ())
+                |> Js.Promise.then_(res => {
+                     switch (res) {
+                     | Errors(_)
+                     | EmptyResponse =>
+                       toast(
+                         ~title="Oops",
+                         ~description="Something went wrong!",
+                         ~position=`topRight,
+                         ~status=`danger,
+                         (),
+                       )
+                     | Data(data) =>
+                       switch (data##createUser) {
+                       | None =>
+                         toast(
+                           ~title="Oops",
+                           ~description="Something went wrong!",
+                           ~position=`topRight,
+                           ~status=`danger,
+                           (),
                          )
-                         |> ignore
-                       | Data(data) =>
-                         switch (data##createUser) {
-                         | None =>
-                           Notification.error(
-                             Notification.makeConfigProps(
-                               ~message="Something went wrong!",
-                               (),
-                             ),
-                           )
-                           |> ignore
-                         | Some(user) =>
-                           onSignUpSuccess(
-                             state.email,
-                             state.password,
-                             user##id,
-                           )
-                         }
-                       };
-                       Js.Promise.resolve();
-                     })
-                  |> ignore;
-                };
-              }}
-              loading={Button.LoadingProp.Bool(result == Loading)}
-              htmlType="submit"
-              _type=`primary>
-              {str("Next")}
-            </Button>
-          </form>
-        </Card>
-      </div>
+                       | Some(user) =>
+                         onSignUpSuccess(
+                           state.email,
+                           state.password,
+                           user##id,
+                         )
+                       }
+                     };
+                     Js.Promise.resolve();
+                   })
+                |> ignore;
+              };
+            }}
+            variantColor=`blue
+            isLoading={result == Loading}>
+            {str("Next")}
+          </Chakra.Button>
+        </form>
+      </Group>
     }}
   </SignUpMutation>;
 };

@@ -1,4 +1,3 @@
-open Ehd;
 open ReasonApolloTypes;
 exception GraphQLErrors(array(graphqlError));
 exception EmptyResponse;
@@ -21,7 +20,8 @@ module SignInConfig = [%graphql
 
 module SignInMutation = ReasonApollo.CreateMutation(SignInConfig);
 [@react.component]
-let make = (~email, ~password, ~setSession) =>
+let make = (~email, ~password, ~setSession) => {
+  let toast = Chakra.Toast.useToast();
   <SignInMutation>
     ...{(mutate, _) => {
       React.useEffect0(() => {
@@ -33,13 +33,13 @@ let make = (~email, ~password, ~setSession) =>
              switch (res) {
              | Errors(_)
              | EmptyResponse =>
-               Notification.error(
-                 Notification.makeConfigProps(
-                   ~message="Something went wrong!",
-                   (),
-                 ),
+               toast(
+                 ~title="Oops",
+                 ~description="Something went wrong!",
+                 ~position=`topRight,
+                 ~status=`danger,
+                 (),
                )
-               |> ignore
              | Data(data) =>
                open Session;
                switch (data##signinUser##token, data##signinUser##user) {
@@ -51,21 +51,21 @@ let make = (~email, ~password, ~setSession) =>
                    squadId: Belt.Option.map(user##squad, squad => squad##id),
                  })
                | (_, _) =>
-                 Notification.error(
-                   Notification.makeConfigProps(
-                     ~message="Something went wrong!",
-                     (),
-                   ),
-                 )
-                 |> ignore
-               };
-               Notification.success(
-                 Notification.makeConfigProps(
-                   ~message="Sign in successfully",
+                 toast(
+                   ~title="Oops",
+                   ~description="Something went wrong!",
+                   ~position=`topRight,
+                   ~status=`danger,
                    (),
-                 ),
-               )
-               |> ignore;
+                 )
+               };
+               toast(
+                 ~title="Welcome back!",
+                 ~description="You've signed in successfully",
+                 ~position=`topRight,
+                 ~status=`success,
+                 (),
+               );
              };
              Js.Promise.resolve();
            })
@@ -75,3 +75,4 @@ let make = (~email, ~password, ~setSession) =>
       <div> {"Logging in..." |> React.string} </div>;
     }}
   </SignInMutation>;
+};
