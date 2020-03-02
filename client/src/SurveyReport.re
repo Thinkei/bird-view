@@ -185,7 +185,7 @@ let make = (~id, ~session) => {
       | NoData => <EmptyData />
       | Error(e) => <FriendlyError message=e##message />
       };
-    | None => <FriendlyError message="You doesn't belong to any squad" />
+    | None => <FriendlyError message="You don't belong to any squad. Try to re-signin or contact Hieu Pham to support" />
     }
   );
 };

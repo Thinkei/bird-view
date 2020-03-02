@@ -9,6 +9,7 @@ module Config = {
   type route =
     | Home
     | Squad(string)
+    | LatestSurveyDetail
     | SurveyDetail(string)
     | SurveyReport(string)
     | NotFound;
@@ -23,6 +24,7 @@ module Config = {
       | [""] => Home
       | ["", "squads", squadId] => Squad(squadId)
       | ["", "surveys", surveyId] => SurveyDetail(surveyId)
+      | ["", "latest"] => LatestSurveyDetail
       | ["", "reports", surveyId] => SurveyReport(surveyId)
       | _ => NotFound
       }
@@ -35,6 +37,7 @@ module Config = {
     | Home => "#"
     | Squad(id) => "#/squads/" ++ id
     | SurveyDetail(id) => "#/surveys/" ++ id
+    | LatestSurveyDetail => "#/latest"
     | SurveyReport(id) => "#/reports/" ++ id
     | NotFound => "#/404";
 };
