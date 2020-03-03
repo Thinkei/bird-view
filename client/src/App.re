@@ -56,6 +56,7 @@ let make = () =>
                      }
 
                    | SurveyDetail(id) => <SurveyDetail id session />
+                   | LatestSurveyDetail => <LatestSurveyDetail session />
                    | SurveyReport(id) =>
                      switch (session.role) {
                      | Some(`Leader)
