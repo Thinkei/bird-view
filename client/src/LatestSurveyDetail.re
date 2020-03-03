@@ -16,7 +16,7 @@ let make = (~session) => {
     switch (session.squadId) {
     | None =>
       <FriendlyError
-        message="You don't belong to any squad. Try to re-signin or contact Hieu Pham to support"
+        message="You don't belong to any squad. Try to re-signin or contact Hieu Pham for support"
       />
     | Some(squadId) =>
       let variables = QueryConfig.makeVariables(~squadId, ());
@@ -28,7 +28,7 @@ let make = (~session) => {
         switch (data##allSurveys |> Array.to_list) {
         | [] =>
           <FriendlyError
-            message="You don't have any survey to answer. Contact Phat Le to support"
+            message="You don't have any survey to answer. Contact Phat Le for support"
           />
         | [survey, ..._] =>
           Js.log(survey##id);

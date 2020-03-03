@@ -99,7 +99,7 @@ let make = (~squadId, ~role) => {
   switch (squadId) {
   | None =>
     <FriendlyError
-      message="You don't belong to any squad. Try to re-signin or contact Hieu Pham to support"
+      message="You don't belong to any squad. Try to re-signin or contact Hieu Pham for support"
     />
   | Some(squadId) =>
     let variables = QueryConfig.make(~squadId, ())##variables;
