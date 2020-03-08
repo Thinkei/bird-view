@@ -92,6 +92,7 @@ module Selection = {
           </div>
           <br />
           <Chakra.Button
+            _type=`submit
             isLoading={result == Loading}
             isDisabled={Belt.Option.isNone(selectedSquad)}
             onClick={e => {

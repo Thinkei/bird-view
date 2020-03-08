@@ -69,6 +69,7 @@ let make = (~onSignUpSuccess) => {
           <br />
           <br />
           <Chakra.Button
+            _type=`submit
             onClick={e => {
               ReactEvent.Synthetic.preventDefault(e);
 
