@@ -1747,7 +1747,7 @@ browserslist@^4.0.0, browserslist@^4.1.0, browserslist@^4.6.0, browserslist@^4.8
 
 "bs-chakra@https://github.com/Thinkei/bs-chakra":
   version "0.0.1"
-  resolved "https://github.com/Thinkei/bs-chakra#354001ffebc71024079005bf1bff855dca24d0ca"
+  resolved "https://github.com/Thinkei/bs-chakra#95f65eaa0767557d2d085bc9591cacc0b871c643"
   dependencies:
     "@chakra-ui/core" "^0.5.2"
     "@emotion/core" "^10.0.27"

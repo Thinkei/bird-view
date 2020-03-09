@@ -91,6 +91,7 @@ let make = (~setSession) => {
           <br />
           <br />
           <Chakra.Button
+            _type=`submit
             onClick={e => {
               setTouched(_ => true);
               ReactEvent.Synthetic.preventDefault(e);
