@@ -27,5 +27,9 @@
     "re-tailwind": "0.0.3",
     "reason-apollo": "git://github.com/apollographql/reason-apollo.git#master",
     "reason-apollo-hooks": "^2.7.0"
+  },
+  "resolutions": {
+    "acorn": "7.1.1",
+    "minimist": "1.2.5"
   }
 }
