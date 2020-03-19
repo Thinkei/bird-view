@@ -1,0 +1,7 @@
+### Kafka Configurations
+
+KAFKA_BROKERS=kafka://127.0.0.1:9092
+
+KAFKA_CA=
+KAFKA_CERT=
+KAFKA_CERT_KEY=

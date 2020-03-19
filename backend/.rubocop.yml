@@ -1,0 +1,2 @@
+inherit_from:
+  - https://raw.githubusercontent.com/Thinkei/Thinkei/master/.rubocop_default.yml
