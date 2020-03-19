@@ -1,0 +1,57 @@
+version: '3'
+services:
+  web:
+    build: .
+    environment:
+      - DATABASE_USR=root
+      - DATABASE_PWD=password17e3
+      - DATABASE_HOST=postgres
+      - DATABASE_NAME=bird_view
+      - APP_ENV=development
+    command: |
+      ./bin/wait-for-it.sh postgres:5432 -- bash -c "bundle exec rake db:migrate && bundle exec puma -p 80"
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    volumes:
+      - ./:/app
+    ports:
+      - "4000:80"
+
+  subscriber:
+    build: .
+    environment:
+      - KAFKA_BROKERS=kafka:9092
+      - DATABASE_USR=root
+      - DATABASE_PWD=password17e3
+      - DATABASE_HOST=postgres
+      - DATABASE_NAME=bird_view
+      - APP_ENV=development
+
+    command: |
+      ./bin/wait-for-it.sh postgres:5432 web:80 -- bundle exec karafka s
+    depends_on:
+      - web
+      - postgres
+    volumes:
+      - ./:/app
+    ports:
+      - "4050:80"
+
+  postgres:
+    image: postgres:9.4
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=password17e3
+      - POSTGRES_DB=bird_view
+    volumes:
+      - /var/lib/postgresql/data
+    ports:
+      - "5432"
+
+# NOTICE: start kafka-docker to create the network: https://github.com/Thinkei/kafka-docker
+networks:
+  default:
+    external:
+      name: kafkadocker_default

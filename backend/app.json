@@ -1,0 +1,44 @@
+{
+  "name": "bird-view",
+  "version": "0.0.1",
+  "repo": {
+    "host": "979797940137.dkr.ecr.ap-southeast-2.amazonaws.com",
+    "name": "employmenthero/bird-view"
+  },
+  "procs": [
+    {
+      "name": "web",
+      "command": [
+        "bundle",
+        "exec",
+        "puma",
+        "-p",
+        "80"
+      ],
+      "serviceType": "ClusterIP",
+      "port": 80,
+      "memory_request": "100Mi",
+      "memory_limit": "100Mi",
+      "metrics": {
+        "command": [
+          "./bin/start_monitoring.sh",
+          "--run-sidecar"
+        ],
+        "port": 9102
+      }
+    },
+    {
+      "name": "monitoring",
+      "command": [
+        "./bin/start_monitoring.sh",
+        "--run-pollings"
+      ],
+      "memory_limit": "250Mi",
+      "serviceType": "ClusterIP",
+      "port": 9102,
+      "metrics": {
+        "port": 9102
+      }
+    }
+  ]
+}
