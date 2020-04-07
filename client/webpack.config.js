@@ -15,7 +15,7 @@ module.exports = {
     mode: isProd ? 'production' : 'development',
     output: {
         path: outputDir,
-        publicPath: outputDir,
+        publicPath: process.env.PUBLIC_PATH || outputDir,
         filename: isProd ? 'Index-[contenthash].js' : 'Index.js'
     },
     devServer: !isProd ? devServer : undefined,

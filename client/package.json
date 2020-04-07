@@ -9,7 +9,7 @@
     "start": "BS_LOG=* bsb -clean -make-world -w",
     "build": "NODE_ENV=production webpack",
     "dev": "webpack-dev-server --open",
-    "now-build": "bsb -clean -make-world && yarn build"
+    "now-build": "bsb -clean -make-world && PUBLIC_PATH=/ yarn build"
   },
   "devDependencies": {
     "bs-log": "^1.0.0",
@@ -17,7 +17,6 @@
     "bsb-js": "^1.1.7",
     "css-loader": "^3.5.0",
     "graphql_ppx": "^0.2.8",
-    "reason-react": "^0.7.0",
     "html-webpack-plugin": "^4.0.4",
     "reason-react": "^0.7.0",
     "style-loader": "^1.1.3",
