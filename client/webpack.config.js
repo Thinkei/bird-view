@@ -20,7 +20,7 @@ module.exports = {
     },
     devServer: !isProd ? devServer : undefined,
     plugins: [
-        new HtmlWebpackPlugin()
+        new HtmlWebpackPlugin({ template: 'index.html' })
     ],
     module: {
         rules: [
