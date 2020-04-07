@@ -19,6 +19,12 @@ Install all necessary dependencies.
 yarn install
 ```
 
+Watch & build your ReasonML file change
+
+```
+yarn start
+```
+
 Start the development server to serve the page at http://localhost:1234
 
 
@@ -26,8 +32,3 @@ Start the development server to serve the page at http://localhost:1234
 yarn dev
 ```
 
-Watch & build your ReasonML file change
-
-```
-yarn start
-```
