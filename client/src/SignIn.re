@@ -1,4 +1,4 @@
-open ReasonApolloTypes;
+open !ReasonApolloTypes;
 exception GraphQLErrors(array(graphqlError));
 exception EmptyResponse;
 
