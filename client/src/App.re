@@ -1,6 +1,6 @@
 [%bs.raw {|require("tailwindcss/dist/tailwind.min.css")|}];
 open Session;
-open Chakra;
+// open Chakra;
 
 module AppRouter = Router.Create(Route.Config);
 
@@ -21,7 +21,7 @@ let make = () =>
                     ~right="10px",
                     (),
                   )}>
-                  <Button
+                  <Chakra.Button
                     size=`sm
                     variant=`outline
                     variantColor=`red
@@ -30,7 +30,7 @@ let make = () =>
                       Utils.refreshPage();
                     }}>
                     {str("Sign out")}
-                  </Button>
+                  </Chakra.Button>
                 </div>
                 {Route.Config.(
                    switch (currentRoute) {
