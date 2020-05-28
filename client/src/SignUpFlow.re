@@ -1,4 +1,4 @@
-open ReasonApolloTypes;
+open !ReasonApolloTypes;
 exception GraphQLErrors(array(graphqlError));
 exception EmptyResponse;
 
@@ -89,7 +89,7 @@ let make = (~setSession) => {
                         (),
                       )
                     | Data(data) =>
-                      open Session;
+                      open !Session;
                       switch (data##signinUser##token, data##signinUser##user) {
                       | (Some(tk), Some(user)) =>
                         setSession({
