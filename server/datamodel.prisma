@@ -1,0 +1,72 @@
+enum AnswerOption {
+  Red
+  Yellow
+  Green
+}
+
+enum Role {
+  Member
+  Leader
+  Admin
+}
+
+type AnswerRecord @model {
+  answer: AnswerOption! @defaultValue(value: Green)
+  card: Card! @relation(name: "AnswerRecordOnCard")
+  createdAt: DateTime! @createdAt
+  id: ID! @id
+  survey: Survey! @relation(name: "AnswerRecordOnSurvey")
+  updatedAt: DateTime! @updatedAt
+  user: User! @relation(name: "AnswerRecordOnUser")
+}
+
+type Card @model {
+  answerRecords: [AnswerRecord!]! @relation(name: "AnswerRecordOnCard")
+  badExample: String!
+  createdAt: DateTime! @createdAt
+  description: String!
+  goodExample: String!
+  id: ID! @id
+  updatedAt: DateTime! @updatedAt
+}
+
+type File @model {
+  contentType: String!
+  createdAt: DateTime! @createdAt
+  id: ID! @id
+  name: String!
+  secret: String! @unique
+  size: Int!
+  updatedAt: DateTime! @updatedAt
+  url: String! @unique
+}
+
+type Squad @model {
+  createdAt: DateTime! @createdAt
+  id: ID! @id
+  name: String!
+  surveys: [Survey!]! @relation(name: "SurveyOnSquad")
+  updatedAt: DateTime! @updatedAt
+  users: [User!]! @relation(name: "UserOnSquad")
+}
+
+type Survey @model {
+  answerRecords: [AnswerRecord!]! @relation(name: "AnswerRecordOnSurvey")
+  createdAt: DateTime! @createdAt
+  enabled: Boolean! @defaultValue(value: true)
+  id: ID! @id
+  squad: Squad! @relation(name: "SurveyOnSquad")
+  updatedAt: DateTime! @updatedAt
+}
+
+type User @model {
+  answerRecords: [AnswerRecord!]! @relation(name: "AnswerRecordOnUser")
+  createdAt: DateTime! @createdAt
+  email: String @unique
+  id: ID! @id
+  name: String
+  password: String
+  role: Role
+  squad: Squad @relation(name: "UserOnSquad")
+  updatedAt: DateTime! @updatedAt
+}
