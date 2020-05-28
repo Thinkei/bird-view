@@ -1,6 +1,5 @@
 [%bs.raw {|require("tailwindcss/dist/tailwind.min.css")|}];
 open Session;
-// open Chakra;
 
 module AppRouter = Router.Create(Route.Config);
 
